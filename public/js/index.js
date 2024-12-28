@@ -764,3 +764,8 @@ document.querySelector("#birthday-button").addEventListener("click",()=>{
   document.querySelector("#birthday-button").classList.add("active");
   loadDashboard(playerList);
 })
+
+// updateButton.addEventListener("click", () => {
+//   console.log("Actualizando...");
+  updatePlayers();
+// });
