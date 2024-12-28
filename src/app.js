@@ -31,8 +31,20 @@ let maxCount = {
     time: Date.now()
 };
 let data = {
-    players: [],
-    updateTime: Date.now(),
+    rm1v1: {
+        players: [],
+        updateTime: Date.now(),
+        min: null,
+        max: null,
+        avg: null
+    },
+    rmTg: {
+        players: [],
+        updateTime: Date.now(),
+        min: null,
+        max: null,
+        avg: null
+    },
 };
 
 io.on('connection', async (socket) => {
