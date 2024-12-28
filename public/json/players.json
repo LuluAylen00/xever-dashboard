@@ -1,0 +1,668 @@
+[
+  {
+    "index": 1,
+    "indexChange": "-",
+    "name": "XEVER | Nahue05",
+    "elo": "2336",
+    "games": {
+      "total": "3744",
+      "won": "1919",
+      "lost": "1825",
+      "winrate": "51.26 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/e6ec00f1f1aa6fb28db836147e3271bef956b1c8_full.jpg",
+    "insightsId": "2826785"
+  },
+  {
+    "index": 2,
+    "indexChange": "-",
+    "name": "XEVER | Rodrixs",
+    "elo": "2232",
+    "games": {
+      "total": "1582",
+      "won": "818",
+      "lost": "764",
+      "winrate": "51.71 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "/static/images/no-avatar.619914ab8f8d.svg",
+    "insightsId": "11440407"
+  },
+  {
+    "index": 3,
+    "indexChange": "-",
+    "name": "XEVER | Tatengue_",
+    "elo": "2103",
+    "games": {
+      "total": "2551",
+      "won": "1307",
+      "lost": "1244",
+      "winrate": "51.23 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/6d9a37c7bc6aebbfa3712ba0ce3b48d48816e739_full.jpg",
+    "insightsId": "1361923"
+  },
+  {
+    "index": 4,
+    "indexChange": "-",
+    "name": "XEVER | TheTiger",
+    "elo": "1990",
+    "games": {
+      "total": "3043",
+      "won": "1555",
+      "lost": "1488",
+      "winrate": "51.10 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/224418cac7cedf0271bfd18fafcc477587a60b2a_full.jpg",
+    "insightsId": "3425325"
+  },
+  {
+    "index": 5,
+    "indexChange": "-",
+    "name": "XEVER | Tigger Clean",
+    "elo": "1965",
+    "games": {
+      "total": "2774",
+      "won": "1440",
+      "lost": "1334",
+      "winrate": "51.91 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "/static/images/no-avatar.619914ab8f8d.svg",
+    "insightsId": "2624148"
+  },
+  {
+    "index": 6,
+    "indexChange": "-",
+    "name": "XEVER | CaboBV",
+    "elo": "1908",
+    "games": {
+      "total": "2710",
+      "won": "1381",
+      "lost": "1329",
+      "winrate": "50.96 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/0764fdf191cfd5546974ead6248f774d86909fe8_full.jpg",
+    "insightsId": "1923202"
+  },
+  {
+    "index": 7,
+    "indexChange": "-",
+    "name": "XEVER | LandyOS",
+    "elo": "1886",
+    "games": {
+      "total": "2199",
+      "won": "1140",
+      "lost": "1059",
+      "winrate": "51.84 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/78a84ac6ba6fc6e551d95376e618f0005f6cd02b_full.jpg",
+    "insightsId": "2979038"
+  },
+  {
+    "index": 8,
+    "indexChange": "-",
+    "name": "XEVER | iDabs",
+    "elo": "1851",
+    "games": {
+      "total": "1509",
+      "won": "797",
+      "lost": "712",
+      "winrate": "52.82 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/d5a3bdc3199386b6b5bc075e7e2778695038eacf_full.jpg",
+    "insightsId": "4477199"
+  },
+  {
+    "index": 9,
+    "indexChange": "-",
+    "name": "XEVER | Darkjosh89",
+    "elo": "1828",
+    "games": {
+      "total": "3363",
+      "won": "1703",
+      "lost": "1660",
+      "winrate": "50.64 %"
+    },
+    "country": {
+      "name": "Chile",
+      "class": "fi-cl"
+    },
+    "image": "/static/images/no-avatar.619914ab8f8d.svg",
+    "insightsId": "2969073"
+  },
+  {
+    "index": 10,
+    "indexChange": "-",
+    "name": "XEVER | Blackspot",
+    "elo": "1817",
+    "games": {
+      "total": "2532",
+      "won": "1281",
+      "lost": "1251",
+      "winrate": "50.59 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/2deb048c6e6e17dd75afacb9a96624d68c7fa7ce_full.jpg",
+    "insightsId": "2878663"
+  },
+  {
+    "index": 11,
+    "indexChange": "-",
+    "name": "XEVER | Hippieee",
+    "elo": "1759",
+    "games": {
+      "total": "2096",
+      "won": "1074",
+      "lost": "1022",
+      "winrate": "51.24 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "/static/images/no-avatar.619914ab8f8d.svg",
+    "insightsId": "1320131"
+  },
+  {
+    "index": 12,
+    "indexChange": "-",
+    "name": "XEVER | Falu",
+    "elo": "1732",
+    "games": {
+      "total": "1562",
+      "won": "799",
+      "lost": "763",
+      "winrate": "51.15 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/07935eb58c5b48279c863aa7f909bfbf4990ad00_full.jpg",
+    "insightsId": "967423"
+  },
+  {
+    "index": 13,
+    "indexChange": "-",
+    "name": "XEVER | EL_Ti_Rex",
+    "elo": "1728",
+    "games": {
+      "total": "4625",
+      "won": "2333",
+      "lost": "2292",
+      "winrate": "50.44 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/54d18bb86e23ee4c7b7688d39bf316b3fbb5e4c6_full.jpg",
+    "insightsId": "2135241"
+  },
+  {
+    "index": 14,
+    "indexChange": "-",
+    "name": "XEVER | Matluck",
+    "elo": "1699",
+    "games": {
+      "total": "870",
+      "won": "459",
+      "lost": "411",
+      "winrate": "52.76 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/0b020d404d0dbe4ceca3de7efb28e1dd4ea494c5_full.jpg",
+    "insightsId": "404465"
+  },
+  {
+    "index": 15,
+    "indexChange": "-",
+    "name": "XEVER | Lalex01",
+    "elo": "1681",
+    "games": {
+      "total": "986",
+      "won": "518",
+      "lost": "468",
+      "winrate": "52.54 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/06aaae35223b06137626e62b14d986c88712f8d0_full.jpg",
+    "insightsId": "8686185"
+  },
+  {
+    "index": 16,
+    "indexChange": "-",
+    "name": "XEVER | Miller",
+    "elo": "1648",
+    "games": {
+      "total": "1718",
+      "won": "871",
+      "lost": "847",
+      "winrate": "50.70 %"
+    },
+    "country": {
+      "name": "Colombia",
+      "class": "fi-co"
+    },
+    "image": "https://avatars.steamstatic.com/10b1fe4896cf00ca7879f1a06983a8e42a8f12f6_full.jpg",
+    "insightsId": "2063512"
+  },
+  {
+    "index": 17,
+    "indexChange": "-",
+    "name": "XEVER | REY",
+    "elo": "1632",
+    "games": {
+      "total": "1115",
+      "won": "579",
+      "lost": "536",
+      "winrate": "51.93 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/91ba9e34b5f64e1040c69df20507e51d13e19ad2_full.jpg",
+    "insightsId": "6267522"
+  },
+  {
+    "index": 18,
+    "indexChange": "-",
+    "name": "XEVER | KUROL",
+    "elo": "1609",
+    "games": {
+      "total": "2363",
+      "won": "1200",
+      "lost": "1163",
+      "winrate": "50.78 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/809750f77228b6fadb65f8940d75b618f99f4e3c_full.jpg",
+    "insightsId": "2478551"
+  },
+  {
+    "index": 19,
+    "indexChange": "-",
+    "name": "XEVER | JoKeR",
+    "elo": "1555",
+    "games": {
+      "total": "904",
+      "won": "467",
+      "lost": "437",
+      "winrate": "51.66 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/14a30c6014e47216bc5b6665fa133db0ef7cbb35_full.jpg",
+    "insightsId": "4448442"
+  },
+  {
+    "index": 20,
+    "indexChange": "-",
+    "name": "XEVER | K1nga",
+    "elo": "1447",
+    "games": {
+      "total": "1358",
+      "won": "694",
+      "lost": "664",
+      "winrate": "51.10 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/9318143a2fa914252e670d55593f3e9da9d0183d_full.jpg",
+    "insightsId": "3407837"
+  },
+  {
+    "index": 21,
+    "indexChange": "-",
+    "name": "XEVER | Pablo!",
+    "elo": "1447",
+    "games": {
+      "total": "1570",
+      "won": "791",
+      "lost": "779",
+      "winrate": "50.38 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/2f15277a724075d099fd04da2a4f1c281beef8f2_full.jpg",
+    "insightsId": "2568623"
+  },
+  {
+    "index": 22,
+    "indexChange": "-",
+    "name": "XEVER | Thanathos",
+    "elo": "1370",
+    "games": {
+      "total": "1500",
+      "won": "759",
+      "lost": "741",
+      "winrate": "50.60 %"
+    },
+    "country": {
+      "name": "Colombia",
+      "class": "fi-co"
+    },
+    "image": "/static/images/no-avatar.619914ab8f8d.svg",
+    "insightsId": "11438613"
+  },
+  {
+    "index": 23,
+    "indexChange": "-",
+    "name": "XEVER | elmasi88",
+    "elo": "1370",
+    "games": {
+      "total": "2036",
+      "won": "1029",
+      "lost": "1007",
+      "winrate": "50.54 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/779a9283a45f17f486f376d2006e7e2f6ba2b141_full.jpg",
+    "insightsId": "4025992"
+  },
+  {
+    "index": 24,
+    "indexChange": "-",
+    "name": "XEVER | Bugatti",
+    "elo": "1365",
+    "games": {
+      "total": "27",
+      "won": "20",
+      "lost": "7",
+      "winrate": "74.07 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/ac6b3acd468457031c98caac6a8f95f0b24b4298_full.jpg",
+    "insightsId": "12683135"
+  },
+  {
+    "index": 25,
+    "indexChange": "-",
+    "name": "XEVER | LuluAylen00",
+    "elo": "1360",
+    "games": {
+      "total": "243",
+      "won": "134",
+      "lost": "109",
+      "winrate": "55.14 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/e190d5751ae71bf6207bd875b4f573e6884de046_full.jpg",
+    "insightsId": "11772225"
+  },
+  {
+    "index": 26,
+    "indexChange": "-",
+    "name": "XEVER | ElDobra",
+    "elo": "1333",
+    "games": {
+      "total": "1360",
+      "won": "693",
+      "lost": "667",
+      "winrate": "50.96 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/b023e40e81f0fa9c328ecb8440d89d1c409540bb_full.jpg",
+    "insightsId": "3352854"
+  },
+  {
+    "index": 27,
+    "indexChange": "-",
+    "name": "XEVER | ReyMisterio",
+    "elo": "1317",
+    "games": {
+      "total": "680",
+      "won": "352",
+      "lost": "328",
+      "winrate": "51.76 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/8773ce3f4d417d73a1fc279e0e9c3a89c1bcf7ad_full.jpg",
+    "insightsId": "6204753"
+  },
+  {
+    "index": 28,
+    "indexChange": "-",
+    "name": "XEVER | Marianop",
+    "elo": "1312",
+    "games": {
+      "total": "452",
+      "won": "236",
+      "lost": "216",
+      "winrate": "52.21 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/d30990f6bc7f3d4e7ebe96ee9af567ac44359ff1_full.jpg",
+    "insightsId": "520549"
+  },
+  {
+    "index": 29,
+    "indexChange": "-",
+    "name": "XEVER | Kuromi",
+    "elo": "1303",
+    "games": {
+      "total": "223",
+      "won": "123",
+      "lost": "100",
+      "winrate": "55.16 %"
+    },
+    "country": {
+      "name": "Chile",
+      "class": "fi-cl"
+    },
+    "image": "https://avatars.steamstatic.com/13d71a3bc67cff44b1f95baa426b7e3f95ba58e8_full.jpg",
+    "insightsId": "6181663"
+  },
+  {
+    "index": 30,
+    "indexChange": "-",
+    "name": "XEVER | BlackSpider",
+    "elo": "1242",
+    "games": {
+      "total": "1348",
+      "won": "680",
+      "lost": "668",
+      "winrate": "50.45 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/5c11dfcc541c509ce634eb640ec2759166525bd7_full.jpg",
+    "insightsId": "2716504"
+  },
+  {
+    "index": 31,
+    "indexChange": "-",
+    "name": "XEVER | SantanDiego",
+    "elo": "1221",
+    "games": {
+      "total": "1091",
+      "won": "552",
+      "lost": "539",
+      "winrate": "50.60 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/3c1468741decdce6e588fc355f1764357c0b7b2d_full.jpg",
+    "insightsId": "10840425"
+  },
+  {
+    "index": 32,
+    "indexChange": "-",
+    "name": "XEVER | Gaucho",
+    "elo": "1219",
+    "games": {
+      "total": "850",
+      "won": "425",
+      "lost": "425",
+      "winrate": "50.00 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/bcbc9f9405e6ac349a24c96e66630485f7bbb838_full.jpg",
+    "insightsId": "11231746"
+  },
+  {
+    "index": 33,
+    "indexChange": "-",
+    "name": "XEVER | Leo_L",
+    "elo": "1168",
+    "games": {
+      "total": "1020",
+      "won": "512",
+      "lost": "508",
+      "winrate": "50.20 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/6fea775ac3b5a472eed1670a681610bfe5d71d96_full.jpg",
+    "insightsId": "291561"
+  },
+  {
+    "index": 34,
+    "indexChange": "-",
+    "name": "XEVER | leenPlayer",
+    "elo": "1058",
+    "games": {
+      "total": "530",
+      "won": "273",
+      "lost": "257",
+      "winrate": "51.51 %"
+    },
+    "country": {
+      "name": "Colombia",
+      "class": "fi-co"
+    },
+    "image": "https://avatars.steamstatic.com/f56e36fa43a2618690b2ad00a29ef06de24b61d7_full.jpg",
+    "insightsId": "2284518"
+  },
+  {
+    "index": 35,
+    "indexChange": "-",
+    "name": "XEVER | Breiti",
+    "elo": "1026",
+    "games": {
+      "total": "591",
+      "won": "304",
+      "lost": "287",
+      "winrate": "51.44 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/5bc2abd49698bd524bb2bb77f6135baecd226dd5_full.jpg",
+    "insightsId": "2796552"
+  },
+  {
+    "index": 36,
+    "indexChange": "-",
+    "name": "XEVER | WOR93",
+    "elo": "1024",
+    "games": {
+      "total": "198",
+      "won": "104",
+      "lost": "94",
+      "winrate": "52.53 %"
+    },
+    "country": {
+      "name": "Argentina",
+      "class": "fi-ar"
+    },
+    "image": "https://avatars.steamstatic.com/c85bcc0c5ee15deb39450b11137ca8c8dd887451_full.jpg",
+    "insightsId": "10421451"
+  },
+  {
+    "index": 37,
+    "indexChange": "-",
+    "name": "XEVER | twitch.tv/tomasamarinero",
+    "elo": "876",
+    "games": {
+      "total": "218",
+      "won": "110",
+      "lost": "108",
+      "winrate": "50.46 %"
+    },
+    "country": {
+      "name": "Colombia",
+      "class": "fi-co"
+    },
+    "image": "https://avatars.steamstatic.com/93257eec5527a5eaad3183cfc9dc8e8e5002a8f2_full.jpg",
+    "insightsId": "3123803"
+  }
+]

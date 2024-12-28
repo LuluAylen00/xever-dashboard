@@ -1,0 +1,25 @@
+{
+  "name": "xever-dashboard",
+  "version": "1.0.0",
+  "description": "Dashboard XEVER",
+  "main": "src/app.js",
+  "scripts": {
+    "test": "nodemon ./src/app.js -e js",
+    "start": "node ./src/app.js",
+    "initialize": "npm i && node ./src/app.js"
+  },
+  "keywords": [],
+  "author": "luluaylen00 <luluaylen00@gmail.com> (https://github.com/LuluAylen00)",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "16.0.3",
+    "express": "4.18.2",
+    "ftp": "0.3.10",
+    "node-fetch": "^3.3.2",
+    "puppeteer": "^23.11.1",
+    "socket.io": "4.7.5"
+  },
+  "devDependencies": {
+    "nodemon": "2.0.21"
+  }
+}

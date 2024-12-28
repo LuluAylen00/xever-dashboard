@@ -1,0 +1,331 @@
+* {
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+  padding: 0;
+  margin: 0;
+}
+
+@keyframes spin {
+  0% {
+      transform: rotate(0deg);
+  }
+  25% {
+      transform: rotate(90deg);
+      animation-timing-function: ease-in;
+  }
+  50% {
+      transform: rotate(180deg);
+      animation-timing-function: ease-out;
+  }
+  75% {
+      transform: rotate(270deg);
+      animation-timing-function: ease-in;
+  }
+  100% {
+      transform: rotate(360deg);
+      animation-timing-function: ease-out;
+  }
+}
+
+@keyframes shake {
+  0% {
+      filter: drop-shadow(0px 0px 6px #331841);
+  }
+  50% {
+      filter: drop-shadow(0px 0px 12px #131841);
+  }
+  100% {
+      filter: drop-shadow(0px 0px 6px #331841);
+  }
+}
+
+@keyframes levitate {
+  0% {
+      box-shadow: 0px 0px 4px 0px #530453bd;
+  }
+  50% {
+      box-shadow: 0px 0px 12px 0px #530453bd;
+  }
+  100% {
+      box-shadow: 0px 0px 4px 0px #530453bd;
+  }
+}
+
+
+body {
+  background-color: black;
+  display: flex;
+}
+
+header {
+  width: 20vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+}
+
+header nav.bg-body-tertiary {
+  background-color: #252035 !important;
+}
+
+header .container-fluid {
+  height: 100%;
+  background-color: #252035;
+}
+
+header a {
+  text-align: center;
+}
+
+header .mainlogo {
+  width: 45%;
+  filter: drop-shadow(0px 0px 9px #331841);
+  animation: shake 3s infinite;
+}
+
+header > nav {
+  width: 100%;
+  height: 100%;
+}
+
+header > nav > div {
+  display: flex;
+  flex-direction: column;
+  width: 20vw;
+}
+
+header .active.nav-link {
+  background-color: #1e001e63;
+  transition: all 0.5s;
+}
+
+header a.nav-link:hover {
+  background-color: #87008763 !important;
+}
+
+header ul {
+  display: flex;
+  flex-direction: column !important;
+}
+
+header ul li.nav-item a {
+  font-size: 22px;
+  padding: 18px;
+}
+
+div.credit-div {
+  height: 150px;
+}
+
+main {
+  width: 80vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  margin-left: 20vw;
+  background-color: #16111c;
+}
+
+main #data-info {
+  height: 16vh;
+  width: 96%;
+  display: flex;
+  justify-content: space-around;
+}
+
+main #data-info > .card {
+  width: 23%;
+  font-size: 28px;
+  border: unset;
+  --bs-body-bg: #252035;
+  box-shadow: 0px 0px 4px 0px #530453bd;
+  border-radius: 15px;
+  border: 1px solid #4a0e81;
+  animation: levitate 3s infinite;
+}
+
+.card p {
+  padding: 0;
+  margin: 0;
+}
+
+main #data-info > .card .card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+main #data-info > .card .card-body i.fas{
+  padding: 7px;
+  font-size: 38px;
+}
+
+main #data-info > .card.card-birthday {
+  width: 35%;
+}
+
+main #data-info > .card.card-birthday .card-body {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+}
+main #data-info > .card.card-birthday .card-body i.fas {
+  font-size: 92px;
+}
+
+main #data-info > .card.card-birthday .card-body > div i {
+  color: gray;
+  font-size: 24px;
+  font-weight: 300;
+}
+
+main #data-table {
+  height: 72vh;
+  width: 96%;
+  overflow-y: scroll;
+}
+
+main #data-table table {
+  --bs-body-bg: #252035;
+}
+
+main #data-table .td-nick i {
+  font-size: 14px;
+  color: gray;
+  transition: all 0.5s;
+}
+
+main #data-table  tr:hover .td-nick i {
+  color: black !important;
+}
+
+
+main #data-division {
+  width: 96%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #252035;
+  margin: 10px;
+  padding: 5px 20px;
+  border-radius: 2px;
+}
+
+main #data-division button {
+  background-color: unset;
+  border-radius: 50%;
+}
+
+main #data-division button i.fas.reloading {
+  /* display: inline-block; Asegura que el ícono sea tratable como un elemento animable */
+  animation: spin 1.5s infinite; /* Duración de 2 segundos, ciclo infinito */
+}
+
+main #data-table th {
+  cursor: pointer;
+}
+
+main #data-table th section {
+  display: flex;
+  justify-content: center;
+}
+
+main #data-table th section i {
+  display: flex;
+  align-items: center;
+  padding: 7px;
+}
+
+main #data-table th section span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+main #data-table th[data-state="0"] i.fa-caret-up, main #data-table th[data-state="0"] i.fa-caret-down {
+  display: none;
+}
+main #data-table th[data-state="0"] i.fa-minus {
+  display: flex;
+}
+
+main #data-table th[data-state="1"] i.fa-caret-up {
+  display: flex;
+}
+main #data-table th[data-state="1"] i.fa-caret-down {
+  display: none;
+}
+main #data-table th[data-state="1"] i.fa-minus {
+  display: none;
+}
+
+main #data-table th[data-state="-1"] i.fa-caret-down {
+  display: flex;
+}
+main #data-table th[data-state="-1"] i.fa-caret-up {
+  display: none;
+}
+main #data-table th[data-state="-1"] i.fa-minus {
+  display: none;
+}
+
+main #data-table tbody tr td, main #data-table tbody tr th {
+  transition: all 0.5s;
+  cursor: default;
+  text-shadow: 0 0 5px #1b0551;
+}
+
+main #data-table tbody tr:hover td, main #data-table tbody tr:hover th {
+  background-color: rgb(88, 88, 88) !important;
+}
+
+main #data-table td img {
+  width: 30px;
+  height: 30px;
+}
+
+main #data-table .td-center {
+  text-align: center;
+}
+
+main #data-table .td-rating {
+  font-size: 16px;
+}
+
+main #data-table .td-streak {
+  font-size: 16px;
+}
+
+main #data-table .td-streak-positive i{
+  background-color: rgba(25, 135, 84, var(--bs-bg-opacity, 1)) !important;
+  padding: 2px 19px;
+  border-radius: 8px;
+}
+
+main #data-table .td-streak-negative i{
+  background-color: rgba(220, 53, 69, var(--bs-bg-opacity, 1)) !important;
+  padding: 2px 19px;
+  border-radius: 8px;
+}
+
+main #data-table .td-totalmatches {
+  font-size: 16px;
+}
+
+main #data-table .td-wins {
+  font-size: 16px;
+}
+
+main #data-table .td-losses {
+  font-size: 16px;
+}
+
+main #data-table .td-winrate {
+  font-size: 16px;
+}
