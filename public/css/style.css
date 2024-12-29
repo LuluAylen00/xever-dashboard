@@ -58,6 +58,31 @@ body {
   display: flex;
 }
 
+.progress {
+  width: 100%;
+  position: absolute;
+  z-index: 99;
+  bottom: 0;
+  height: 1% !important;
+  transition: all 0.5s;
+  background-color: #343a40;
+  border-radius: 0;
+}
+
+.progress.hide {
+  background-color: #343a4000;
+}
+
+.progress div {
+  display: flex;
+  background-color: #4a0e81;
+  transition: all 0.5s;
+}
+
+.progress div.hide {
+  background-color: #4a0e8100;
+}
+
 header {
   width: 20vw;
   height: 100vh;
@@ -127,6 +152,7 @@ main {
   justify-content: space-around;
   margin-left: 20vw;
   background-color: #16111c;
+  position: relative;
 }
 
 main #data-info {

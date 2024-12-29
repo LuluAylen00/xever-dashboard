@@ -1,3 +1,7 @@
+// Usa tu ID de hoja y clave de API
+const spreadsheetId = "166e5MqfdBd76dg7KOmqnaRlGoV5uOAXZC-5Jez_VJzM"; // Reemplaza con tu ID
+const apiKey = "AIzaSyDjcpdyrdcn8_ESTpHLCOnrT0MIMbg7OCk"; // Reemplaza con tu clave de API
+
 async function fetchGoogleSheetData(spreadsheetId, apiKey) {
   const sheetName = "Datos XEVER"; // Cambia esto al nombre de tu hoja si es distinto
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}?key=${apiKey}`;
@@ -27,16 +31,6 @@ async function fetchGoogleSheetData(spreadsheetId, apiKey) {
     return [];
   }
 }
-
-// Usa tu ID de hoja y clave de API
-const spreadsheetId = "166e5MqfdBd76dg7KOmqnaRlGoV5uOAXZC-5Jez_VJzM"; // Reemplaza con tu ID
-const apiKey = "AIzaSyDjcpdyrdcn8_ESTpHLCOnrT0MIMbg7OCk"; // Reemplaza con tu clave de API
-
-
-
-let socket = io();
-
-let activePage = "1v1";
 
 function trunc (x, posiciones = 0) {
   var s = x.toString()
@@ -92,8 +86,104 @@ async function getImage(name) {
   }
 }
 
+async function modifyTableBody(players, tbody) {
+  // let tbody = document.querySelector("tbody");
+  tbody.innerHTML = "";
+  for (let i = 0; i < players.players.length; i++) {
+    const player = players.players[i];
+    tbody.innerHTML += `
+      <tr class="player-menu" data-profile="${players.statGroups_id}">
+        <th scope="row">${i + 1}</th>
+        <td><img src="${await getImage(player.name)}"> ${player.name}</td>
+        <td class="td-center td-rating">${player.rating}</td>
+        <td class="td-center td-streak ${parseInt(player.streak) > 0 ? "td-streak-positive" : "td-streak-negative"}"><i>${player.streak}</i></td>
+        <td class="td-center td-totalmatches">${player.losses + player.wins}</td>
+        <td class="td-center td-wins">${player.wins}</td>
+        <td class="td-center td-losses">${player.losses}</td>
+        <td class="td-center td-winrate">${trunc(100 * player.wins / (player.losses + player.wins), 2)}%</td>
+      </tr>
+    `;
+  }
+}
+
+function mergeUniquePlayers(data) {
+  const players1v1 = data.rm1v1.players;
+  const playersTg = data.rmTg.players;
+
+  // Unimos los arrays y eliminamos duplicados por statgroup_id
+  const uniquePlayers = [
+      ...new Map(
+          [...players1v1, ...playersTg].map(player => [player.statgroup_id, player])
+      ).values()
+  ];
+
+  console.log(uniquePlayers);
+  
+
+  return uniquePlayers;
+}
+
+function sortBirthdaysFromToday(players) {
+  const today = new Date(); // Fecha actual
+  const currentYear = today.getFullYear();
+
+  players.forEach(player => {
+      if (!player.birthday) {
+          player.dateObject = null; // Manejar undefined como nulo
+          return;
+      }
+
+      const [day, monthName] = player.birthday.split(" de ");
+      const monthIndex = [
+          "enero", "febrero", "marzo", "abril", "mayo", "junio",
+          "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+      ].indexOf(monthName);
+
+      if (monthIndex === -1) {
+          player.dateObject = null; // Manejar entradas inválidas como nulo
+          return;
+      }
+
+      // Crear dos fechas: una para este año y otra para el próximo
+      const birthdayThisYear = new Date(currentYear, monthIndex, day);
+      const birthdayNextYear = new Date(currentYear + 1, monthIndex, day);
+
+      // Seleccionar la fecha más cercana desde hoy
+      player.dateObject = birthdayThisYear >= today ? birthdayThisYear : birthdayNextYear;
+  });
+
+  // Ordenar: primero por `dateObject` válido y luego por la fecha
+  players.sort((a, b) => {
+      if (!a.dateObject && !b.dateObject) return 0;
+      if (!a.dateObject) return 1; // Mover indefinidos al final
+      if (!b.dateObject) return -1; // Mover indefinidos al final
+      return a.dateObject - b.dateObject; // Ordenar por fecha
+  });
+
+  // Limpiar las fechas temporales antes de devolver
+  players.forEach(player => delete player.dateObject);
+
+  return players;
+}
+
+window.addEventListener("load", async ()=> {
+
+  let sessionData = JSON.parse(sessionStorage.getItem("players"))
+
+  let spreadsheet = await fetchGoogleSheetData(spreadsheetId, apiKey);
+
+
+
+
+
+  let socket = io();
+
+  let activePage = "rm1v1";
+
+
+
   async function updatePlayers(){
-    let playerList = JSON.parse(sessionStorage.getItem("players"));
+    let playerList = JSON.parse(sessionStorage.getItem("players")) || [];
 
     let updateButton = document.querySelector("#update-button button i.fas");
     updateButton.classList.add("reloading");
@@ -102,381 +192,166 @@ async function getImage(name) {
     let startTime = Date.now();
     
     let players = [];
-    if (activePage == "1v1") {
-      for (let i = 0; i < 215; i++) {
-        try {
-          let page = await fetch(`/proxy?url=https://aoe-api.worldsedgelink.com/community/leaderboard/getLeaderBoard2?leaderboard_id=3&platform=PC_STEAM&title=age2&sortBy=1&start=${i*200 || 1}&count=200`);
-          // console.log(page);
-          
-          let data = await page.json();
-    
-          let newPlayers = data.leaderboardStats.map((player,i)=>{
-            let thisOne = data.statGroups.find(pl => pl.id == player.statgroup_id).members[0];
-            // let steamdata;
-            // try {
-            //   console.log(thisOne.name.split("/"));
-            //   if (thisOne.name.split("/").length > 1 && thisOne.name.split("/")[1] == "steam") {
-  
-            //     let steamfetch = await fetch(`/proxy?url=http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=3BA33E85060D48ED356099E45C56A3D0&steamids=${thisOne.name.split("/")[2]}`);
-            //     console.log(steamfetch);
-            //     steamdata = await steamfetch.json();
-            //   }
-            // } catch (error) {
-            //   // console.log(error);
-              
-            // }
-            
-            // console.log(thisOne.name.split("/")[2]);
-            
-  
-            return {
-              ...player,
-              name: thisOne.alias,
-              url: thisOne.name,
-              country: thisOne.country,
-              clan: thisOne.clanlist_name,
-              image: "/img/default.png"
-            }
-          })
-    
-          // console.log(newPlayers);
-          players = [...players, ...newPlayers];
-        } catch (error) {
-          console.log(error);
-        }
-        
-      }
-      players = players.filter(pl => (pl.name.startsWith("XEVER |") || pl.name.startsWith("X |") || (pl.name.toLowerCase().includes("xever") && pl.clan.toLowerCase().includes("xever"))));
+
+    let pageUrl;
+    if (activePage == "rmTg") {
+      console.log("preparando para actualizar tg");
+      pageUrl = ["/proxy?url=https://aoe-api.worldsedgelink.com/community/leaderboard/getLeaderBoard2?leaderboard_id=4&platform=PC_STEAM&title=age2&type=default&sortBy=1&start=","&count=200"];
     } else {
-      players = playerList.rm1v1 ? playerList.rm1v1.players : [];
+      console.log("preparando para actualizar 1v1");
+      pageUrl = ["/proxy?url=https://aoe-api.worldsedgelink.com/community/leaderboard/getLeaderBoard2?leaderboard_id=3&platform=PC_STEAM&title=age2&type=default&sortBy=1&start=","&count=200"];
     }
 
-    let playersTg = [];
-    if (activePage == "tg") {
-      for (let i = 0; i < 215; i++) {
-        try {
-          let page = await fetch(`/proxy?url=https://aoe-api.worldsedgelink.com/community/leaderboard/getLeaderBoard2?leaderboard_id=4&platform=PC_STEAM&title=age2&sortBy=1&start=${i*200 || 1}&count=200`);
-          // console.log(page);
-          
-          let data = await page.json();
-    
-          let newPlayers = data.leaderboardStats.map((player,i)=>{
-            let thisOne = data.statGroups.find(pl => pl.id == player.statgroup_id).members[0];
-            // let steamdata;
-            // try {
-            //   console.log(thisOne.name.split("/"));
-            //   if (thisOne.name.split("/").length > 1 && thisOne.name.split("/")[1] == "steam") {
-  
-            //     let steamfetch = await fetch(`/proxy?url=http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=3BA33E85060D48ED356099E45C56A3D0&steamids=${thisOne.name.split("/")[2]}`);
-            //     console.log(steamfetch);
-            //     steamdata = await steamfetch.json();
-            //   }
-            // } catch (error) {
-            //   // console.log(error);
-              
-            // }
-            
-            // console.log(thisOne.name.split("/")[2]);
-            
-  
-            return {
-              ...player,
-              name: thisOne.alias,
-              url: thisOne.name,
-              country: thisOne.country,
-              clan: thisOne.clanlist_name,
-              image: "/img/default.png"
-            }
-          })
-    
-          // console.log(newPlayers);
-          playersTg = [...playersTg, ...newPlayers];
-        } catch (error) {
-          console.log(error);
+    let amount = 4;
+    let progressCont = document.querySelector(".progress");
+    progressCont.classList.remove("hide");
+    let progressBar = document.querySelector(".progress-bar");
+    progressBar.classList.remove("hide");
+    for (let i = 0; i < amount; i++) {
+      // console.log(`${i || 1} de ${amount}`);
+      
+      let page = await fetch(pageUrl[0]+(i*200 || 1)+pageUrl[1]);
+      let data = await page.json();
+
+      amount = data.rankTotal / 200;
+
+      progressBar.setAttribute("style", `width: ${(i || 1) * 100 / amount}%`);
+      
+      let newPlayers = data.leaderboardStats.map((player,i)=>{
+        let thisOne = data.statGroups.find(pl => pl.id == player.statgroup_id).members[0];            
+        // console.log("newplayers", player);
+        // console.log("thisOne", thisOne);
+
+        let cleanPlayerStats = {
+          name: thisOne.alias,
+          url: thisOne.name,
+          country: thisOne.country,
+          clan: thisOne.clanlist_name,
+          image: "/img/default.png",
         }
         
+        let ladderStats = {
+          rank: player.rank,
+          highestrank: player.highestrank,
+          drops: player.drops,
+          rating: player.rating,
+          highestrating: player.highestrating,
+          losses: player.losses,
+          wins: player.wins,
+          streak: player.streak,
+          lastmatchdate: player.lastmatchdate 
+        }
+
+        cleanPlayerStats[player.leaderboard_id == "3" ? "rm1v1" : "rmTg"] = ladderStats;
+        // console.log("cleanplayerstats", cleanPlayerStats);
+        
+        
+        return cleanPlayerStats;
+      })
+      players = [...players, ...newPlayers];
+    };
+
+    function isWhiteListed(urlDeSteam) {
+      let urls = [
+        "76561198096340360", // Bl4ck principal
+        // "76561199234087198", // Bl4ck secundaria
+        "76561198314917416", // m0re principal
+        "76561198420133451" // Mago principal
+      ]
+      for (let i = 0; i < urls.length; i++) {
+        const url = urls[i];
+        if (urlDeSteam.includes(url)) {
+          return true;
+        }
       }
-      playersTg = playersTg.filter(pl => (pl.name.startsWith("XEVER |") || pl.name.startsWith("X |") || (pl.name.toLowerCase().includes("xever") && pl.clan.toLowerCase().includes("xever"))));
-    } else {
-      playersTg = playerList.rmTg ? playerList.rmTg.players : [];
-    }
+      return false;
+    };
 
+    players = players.filter(pl => {
+      // Si está en el clan normalmente (o si tiene la X en lugar de XEVER)
+      if (pl.name.startsWith("XEVER |") || pl.name.startsWith("X |")) {
+        return true;
+        // Si está en el clan pero no tiene la barra vertical en el nombre
+      } else if (pl.name.toLowerCase().includes("xever") && pl.clan.toLowerCase().includes("xever")){
+        return true;
+        // Si tienen coronita y no se van a poner el tag.......
+      } else if (isWhiteListed(pl.url)) {
+        return true;
+      } else {
+        return false;
+      }
+    });
 
+    console.log(players);
+    
+    let finalList = [];
+    
+    let completeArray = [...sessionData.players, ...players];
+    
+    completeArray.forEach(async pl => {
+      let playerInSpreadsheet = spreadsheet.find(p => pl.url.includes(p["ID STEAM"]))
+          
+      pl.alias = playerInSpreadsheet ? playerInSpreadsheet["AKA"] : undefined;
+      pl.birthday = playerInSpreadsheet ? playerInSpreadsheet["CUMPLEAÑOS"] : undefined;
+      pl.team = playerInSpreadsheet ? playerInSpreadsheet["GRUPO"] : undefined; 
+          
+
+      let playerFound = finalList.find(p => {
+        return p.name == pl.name;
+      })
+      let existentPlayer = finalList.indexOf(playerFound);
+      // console.log();
+      
+      // console.log(existentPlayer);
+      if (existentPlayer > -1) {
+        finalList[existentPlayer]["rm1v1"] = pl.rm1v1 ? pl.rm1v1 : finalList[existentPlayer]["rm1v1"];
+        finalList[existentPlayer]["rmTg"] = pl.rmTg ? pl.rmTg : finalList[existentPlayer]["rmTg"];
+        // finalList.push(existentPlayer);
+      } else {
+        finalList.push(pl);
+        // console.log(`${pl.name} no existía, asique se añadió uno mas al total de ${finalList.length}`);
+        
+      }
+    })
+    // console.log(finalList);
+    
+    
     console.log("Finalizando luego de "+ (Date.now() - startTime) / 1000  + " segundos");
-    console.log({ rm1v1: players, rmTg: playersTg});
-    
-
     updateButton.classList.remove("reloading");
     
-    socket.emit("update-players", { rm1v1: players, rmTg: playersTg});
+    progressCont.classList.add("hide");
+    progressBar.classList.add("hide");
+    
+    socket.emit("update-players", finalList);
   }
 
   // updatePlayers();
 
-  async function modifyTableBody(players, tbody) {
-    // let tbody = document.querySelector("tbody");
-    tbody.innerHTML = "";
-    for (let i = 0; i < players.players.length; i++) {
-      const player = players.players[i];
-      tbody.innerHTML += `
-        <tr>
-          <th scope="row">${i + 1}</th>
-          <td><img src="${await getImage(player.name)}"> ${player.name}</td>
-          <td class="td-center td-rating">${player.rating}</td>
-          <td class="td-center td-streak ${parseInt(player.streak) > 0 ? "td-streak-positive" : "td-streak-negative"}"><i>${player.streak}</i></td>
-          <td class="td-center td-totalmatches">${player.losses + player.wins}</td>
-          <td class="td-center td-wins">${player.wins}</td>
-          <td class="td-center td-losses">${player.losses}</td>
-          <td class="td-center td-winrate">${trunc(100 * player.wins / (player.losses + player.wins), 2)}%</td>
-        </tr>
-      `;
-    }
-  }
+  
 
   // Función para unir jugadores sin duplicados
-  function mergeUniquePlayers(data) {
-    const players1v1 = data.rm1v1.players;
-    const playersTg = data.rmTg.players;
+  
 
-    // Unimos los arrays y eliminamos duplicados por statgroup_id
-    const uniquePlayers = [
-        ...new Map(
-            [...players1v1, ...playersTg].map(player => [player.statgroup_id, player])
-        ).values()
-    ];
-
-    console.log(uniquePlayers);
+  let playerData;
+  socket.on("player-data", data => playerData = data);
+  async function loadDashboard(){
+    let totalPlayers = sessionData;
+    console.log(sessionData);
     
+    let variable = activePage;
+    let players = {};
 
-    return uniquePlayers;
-  }
-
-
-  /*
-  function generateEvents(players, tbody) {
-    document.querySelector("#order-number").addEventListener("click",()=>{
-      let state = document.querySelector("#order-number").getAttribute("data-state");
-      if (!state || state == "0") {
-        players.players.sort((a,b)=> a.rating - b.rating);
-        document.querySelector("#order-number").setAttribute("data-state","1");
-      } else if (state == "1"){
-        players.players.sort((a,b)=> a.rating - b.rating);
-        document.querySelector("#order-number").setAttribute("data-state","2");
-      } else {
-        players.players.sort((a,b)=> a.rating - b.rating);
-        document.querySelector("#order-number").setAttribute("data-state","0");
+    sessionData.players.sort((a,b) => {
+      if (activePage == "rm1v1") {
+        return (b.rm1v1 ? b.rm1v1.rating : 0) - (a.rm1v1 ? a.rm1v1.rating : 100);
+      } else if (activePage == "rmTg") {
+        return ( b.rmTg ? b.rmTg.rating : 0) - ( a.rmTg ? a.rmTg.rating : 100);
       }
-
-      modifyTableBody(players, tbody);
-      generateEvents(players, tbody);
     })
-    document.querySelector("#order-nick").addEventListener("click",()=>{
-      let state = document.querySelector("#order-nick").getAttribute("data-state");
-      if (!state || state == "0") {
-        players.players.sort((a,b)=> a.name - b.name)
-        document.querySelector("#order-nick").setAttribute("data-state","1");
-      } else if (state == "1"){
-        players.players.sort((a,b)=> a.name - b.name)
-        document.querySelector("#order-nick").setAttribute("data-state","2");
-      } else {
-        players.players.sort((a,b)=> a.rating - b.rating);
-        document.querySelector("#order-nick").setAttribute("data-state","0");
-      }
-
-      modifyTableBody(players, tbody);
-      generateEvents(players, tbody);
-    })
-    document.querySelector("#order-rating").addEventListener("click",()=>{
-      let state = document.querySelector("#order-rating").getAttribute("data-state");
-      if (!state || state == "0") {
-        players.players.sort((a,b)=> a.rating - b.rating)
-        document.querySelector("#order-rating").setAttribute("data-state","1");
-      } else if (state == "1"){
-        players.players.sort((a,b)=> a.rating - b.rating)
-        document.querySelector("#order-rating").setAttribute("data-state","2");
-      } else {
-        players.players.sort((a,b)=> a.rating - b.rating);
-        document.querySelector("#order-rating").setAttribute("data-state","0");
-      }
-
-      modifyTableBody(players, tbody);
-      generateEvents(players, tbody);
-    })
-    document.querySelector("#order-streak").addEventListener("click",()=>{
-      let state = document.querySelector("#order-streak").getAttribute("data-state");
-      if (!state || state == "0") {
-        players.players.sort((a,b)=> a.streak - b.streak)
-        document.querySelector("#order-streak").setAttribute("data-state","1");
-      } else if (state == "1"){
-        players.players.sort((a,b)=> a.streak - b.streak)
-        document.querySelector("#order-streak").setAttribute("data-state","2");
-      } else {
-        players.players.sort((a,b)=> a.rating - b.rating);
-        document.querySelector("#order-streak").setAttribute("data-state","0");
-      }
-
-      modifyTableBody(players, tbody);
-      generateEvents(players, tbody);
-    })
-    document.querySelector("#order-matches").addEventListener("click",()=>{
-      let state = document.querySelector("#order-matches").getAttribute("data-state");
-      if (!state || state == "0") {
-        players.players.sort((a,b)=> (a.losses + a.wins) - (b.losses + b.wins))
-        document.querySelector("#order-matches").setAttribute("data-state","1");
-      } else if (state == "1"){
-        players.players.sort((a,b)=> (a.losses + a.wins) - (b.losses + b.wins))
-        document.querySelector("#order-matches").setAttribute("data-state","2");
-      } else {
-        players.players.sort((a,b)=> a.rating - b.rating);
-        document.querySelector("#order-matches").setAttribute("data-state","0");
-      }
-
-      modifyTableBody(players, tbody);
-      generateEvents(players, tbody);
-    })
-    document.querySelector("#order-victorias").addEventListener("click",()=>{
-      let state = document.querySelector("#order-victorias").getAttribute("data-state");
-      if (!state || state == "0") {
-        players.players.sort((a,b)=> a.wins - b.wins)
-        document.querySelector("#order-victorias").setAttribute("data-state","1");
-      } else if (state == "1"){
-        players.players.sort((a,b)=> a.wins - b.wins)
-        document.querySelector("#order-victorias").setAttribute("data-state","2");
-      } else {
-        players.players.sort((a,b)=> a.rating - b.rating);
-        document.querySelector("#order-victorias").setAttribute("data-state","0");
-      }
-
-      modifyTableBody(players, tbody);
-      generateEvents(players, tbody);
-    })
-    document.querySelector("#order-derrotas").addEventListener("click",()=>{
-      let state = document.querySelector("#order-derrotas").getAttribute("data-state");
-      if (!state || state == "0") {
-        players.players.sort((a,b)=> a.losses - b.losses)
-        document.querySelector("#order-derrotas").setAttribute("data-state","1");
-      } else if (state == "1"){
-        players.players.sort((a,b)=> a.losses - b.losses)
-        document.querySelector("#order-derrotas").setAttribute("data-state","2");
-      } else {
-        players.players.sort((a,b)=> a.rating - b.rating);
-        document.querySelector("#order-derrotas").setAttribute("data-state","0");
-      }
-
-      modifyTableBody(players, tbody);
-      generateEvents(players, tbody);
-    })
-    document.querySelector("#order-winrate").addEventListener("click",()=>{
-      let state = document.querySelector("#order-winrate").getAttribute("data-state");
-      if (!state || state == "0") {
-        players.players.sort((a,b)=> trunc(100 * a.wins / (a.losses + a.wins), 2) - trunc(100 * b.wins / (b.losses + b.wins), 2))
-        document.querySelector("#order-winrate").setAttribute("data-state","1");
-      } else if (state == "1"){
-        players.players.sort((a,b)=> trunc(100 * a.wins / (a.losses + a.wins), 2) - trunc(100 * b.wins / (b.losses + b.wins), 2))
-        document.querySelector("#order-winrate").setAttribute("data-state","2");
-      } else {
-        players.players.sort((a,b)=> a.rating - b.rating);
-        document.querySelector("#order-winrate").setAttribute("data-state","0");
-      }
-
-      modifyTableBody(players, tbody);
-      generateEvents(players, tbody);
-    })
-  }
-  */
-  async function loadDashboard(players){
-    let spreadsheet = await fetchGoogleSheetData(spreadsheetId, apiKey);
-
-    if (activePage == "tg") {
-      players = players.rmTg;
-    } else if (activePage == "1v1") {
-      players = players.rm1v1;
-    } else if (activePage == "birthday") {
-      players = {
-        players: mergeUniquePlayers(players).map(player => {
-          let playerInSpreadsheet = spreadsheet.find(pl => player.url.includes(pl["ID STEAM"]))
-          return {
-            ...player,
-            alias: playerInSpreadsheet ? playerInSpreadsheet["AKA"] : undefined ,
-            birthday: playerInSpreadsheet ? playerInSpreadsheet["CUMPLEAÑOS"] : undefined ,
-            team: playerInSpreadsheet ? playerInSpreadsheet["GRUPO"] : undefined 
-          }
-        }),
-        updateTime: players.rm1v1.updateTime,
-      };
-      console.log(players);
-      
-    } else if (activePage == "teams") {
-      players = {
-        players: mergeUniquePlayers(players).map(player => {
-
-          return {
-            ...player,
-            alias: playerInSpreadsheet ? playerInSpreadsheet["AKA"] : undefined ,
-            birthday: playerInSpreadsheet ? playerInSpreadsheet["CUMPLEAÑOS"] : undefined ,
-            team: playerInSpreadsheet ? playerInSpreadsheet["GRUPO"] : undefined 
-          }
-        }),
-        updateTime: players.rm1v1.updateTime,
-      };
-    }
 
     if (activePage == "birthday") {
-      // Datos de ejemplo con cumpleaños
-      // const players = [
-      //   { name: "Player 1", birthday: "3 de octubre" },
-      //   { name: "Player 2", birthday: "27 de diciembre" },
-      //   { name: "Player 3", birthday: "15 de enero" },
-      //   { name: "Player 4", birthday: "28 de diciembre" }
-      // ];
-
-      // Función para ordenar cumpleaños desde hoy hasta un día antes
-      function sortBirthdaysFromToday(players) {
-        const today = new Date(); // Fecha actual
-        const currentYear = today.getFullYear();
-    
-        players.forEach(player => {
-            if (!player.birthday) {
-                player.dateObject = null; // Manejar undefined como nulo
-                return;
-            }
-    
-            const [day, monthName] = player.birthday.split(" de ");
-            const monthIndex = [
-                "enero", "febrero", "marzo", "abril", "mayo", "junio",
-                "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
-            ].indexOf(monthName);
-    
-            if (monthIndex === -1) {
-                player.dateObject = null; // Manejar entradas inválidas como nulo
-                return;
-            }
-    
-            // Crear dos fechas: una para este año y otra para el próximo
-            const birthdayThisYear = new Date(currentYear, monthIndex, day);
-            const birthdayNextYear = new Date(currentYear + 1, monthIndex, day);
-    
-            // Seleccionar la fecha más cercana desde hoy
-            player.dateObject = birthdayThisYear >= today ? birthdayThisYear : birthdayNextYear;
-        });
-    
-        // Ordenar: primero por `dateObject` válido y luego por la fecha
-        players.sort((a, b) => {
-            if (!a.dateObject && !b.dateObject) return 0;
-            if (!a.dateObject) return 1; // Mover indefinidos al final
-            if (!b.dateObject) return -1; // Mover indefinidos al final
-            return a.dateObject - b.dateObject; // Ordenar por fecha
-        });
-    
-        // Limpiar las fechas temporales antes de devolver
-        players.forEach(player => delete player.dateObject);
-    
-        return players;
-      }
-      const sortedPlayers = sortBirthdaysFromToday(players.players);
-      console.log(sortedPlayers);
-
-      // Ordenar el array
+      
+      const sortedPlayers = sortBirthdaysFromToday(sessionData.players);
 
       let dataInfo = document.getElementById("data-info");
       {
@@ -563,7 +438,8 @@ async function getImage(name) {
         // let tbody = document.querySelector("tbody");
         // generateEvents(players, tbody);
   
-      }
+      } 
+     
     } else {
       let dataInfo = document.getElementById("data-info");
       {
@@ -573,34 +449,36 @@ async function getImage(name) {
             <span class="visually-hidden">Loading...</span>
           </div>
         `;
-    
+        // console.log(sessionData);
+        // console.log(activePage);
+        
         dataInfo.innerHTML = `
           <div class="card" style="">
             <div class="card-body">
               <i class="fas fa-chevron-down"></i>
               <h5 class="card-title">Elo mínimo</h5>
-              <p class="card-text">${players.min || spinner}</p>
+              <p class="card-text">${sessionData[variable].min || spinner}</p>
             </div>
           </div>
           <div class="card" style="">
             <div class="card-body">
               <i class="fas fa-balance-scale"></i>
               <h5 class="card-title">Elo promedio</h5>
-              <p class="card-text">${players.avg ? Math.trunc(players.avg) : spinner}</p>
+              <p class="card-text">${sessionData[variable].avg ? Math.trunc(sessionData[variable].avg) : spinner}</p>
             </div>
           </div>
           <div class="card" style="">
             <div class="card-body">
               <i class="fas fa-chart-line"></i>
               <h5 class="card-title">Elo máximo</h5>
-              <p class="card-text">${players.max || spinner}</p>
+              <p class="card-text">${sessionData[variable].max || spinner}</p>
             </div>
           </div>
           <div class="card" style="">
             <div class="card-body">
               <i class="fas fa-calculator"></i>
               <h5 class="card-title">Cantidad de jugadores</h5>
-              <p class="card-text">${players.length || spinner}</p>
+              <p class="card-text">${sessionData[variable].length || spinner}</p>
             </div>
           </div>
         `
@@ -608,7 +486,7 @@ async function getImage(name) {
     
       let dataDivision = document.querySelector("#data-division");
       {
-        let date = new Date(players.updateTime);
+        let date = new Date(sessionData[variable].updateTime);
         dataDivision.innerHTML = `
           <div id="last-update">Ultima actualización: ${date.toLocaleString(navigator.language || 'es-AR', { hour12: false })}</div>
           <div id="update-button">
@@ -637,7 +515,7 @@ async function getImage(name) {
         let table = document.createElement("table");
         table.classList.add("table");
         table.classList.add("table-striped");
-    
+        
         {
           let thead = document.createElement("thead");
           thead.innerHTML = `
@@ -656,18 +534,18 @@ async function getImage(name) {
         }
         {
           let tbody = document.createElement("tbody");
-          for (let i = 0; i < players.players.length; i++) {
-            const player = players.players[i];
+          for (let i = 0; i < sessionData.players.filter(p => p[variable]).length; i++) {
+            const player = sessionData.players.filter(p => p[variable])[i];
             tbody.innerHTML += `
-              <tr data-name="${player.name}" data-rating="${player.rating}" data-streak="${player.streak}" data-totalmatches="${player.losses + player.wins}" data-wins="${player.wins}" data-losses="${player.losses}" data-winrate="${trunc(100 * player.wins / (player.losses + player.wins), 2)}">
+              <tr data-name="${player.name}" data-rating="${player[variable].rating}" data-streak="${player[variable].streak}" data-totalmatches="${player[variable].losses + player[variable].wins}" data-wins="${player[variable].wins}" data-losses="${player[variable].losses}" data-winrate="${trunc(100 * player[variable].wins / (player[variable].losses + player[variable].wins), 2)}">
                 <th class="td-number" scope="row">${i + 1}</th>
-                <td class="td-nick"><img src="${await getImage(player.name)}"> ${player.name} <i>(#${player.rank})</i></td>
-                <td class="td-center td-rating">${player.rating}</td>
-                <td class="td-center td-streak ${parseInt(player.streak) > 0 ? "td-streak-positive" : "td-streak-negative"}"><i>${player.streak}</i></td>
-                <td class="td-center td-totalmatches">${player.losses + player.wins}</td>
-                <td class="td-center td-wins">${player.wins}</td>
-                <td class="td-center td-losses">${player.losses}</td>
-                <td class="td-center td-winrate">${trunc(100 * player.wins / (player.losses + player.wins), 2)}%</td>
+                <td class="td-nick"><img src="${await getImage(player.name)}"> ${player.name} <i>(#${player[variable].rank})</i></td>
+                <td class="td-center td-rating">${player[variable].rating}</td>
+                <td class="td-center td-streak ${parseInt(player[variable].streak) > 0 ? "td-streak-positive" : "td-streak-negative"}"><i>${player[variable].streak}</i></td>
+                <td class="td-center td-totalmatches">${player[variable].losses + player[variable].wins}</td>
+                <td class="td-center td-wins">${player[variable].wins}</td>
+                <td class="td-center td-losses">${player[variable].losses}</td>
+                <td class="td-center td-winrate">${trunc(100 * player[variable].wins / (player[variable].losses + player[variable].wins), 2)}%</td>
               </tr>
             `;
           }
@@ -720,6 +598,137 @@ async function getImage(name) {
             rows.forEach(row => tbody.appendChild(row));
           });
         })
+
+        let tableRows = document.querySelectorAll("#data-table tbody tr");
+        // console.log(tableRows);
+        tableRows.forEach(tableRow => {
+          tableRow.addEventListener("click", () => {
+            // console.log(tableRow.dataset);
+            // Aquí podrías mostrar información detallada del jugador seleccionado
+            //...
+
+            // socket.emit("find-player", tableRow.dataset.name);
+
+            fetch(`/json/players.json`)
+            .then((res)=> res.json())
+            .then(async (resultPlayers)=> {
+              let foundPlayer = resultPlayers.find(pl => pl.name == tableRow.dataset.name);
+              // console.log(totalPlayers);
+              
+              let gotPlayer = mergeUniquePlayers(totalPlayers).find(pl => pl.name == tableRow.dataset.name);
+              
+              let playerInSpreadsheet = {};
+              if (gotPlayer) {
+               playerInSpreadsheet = spreadsheet.find(pl => gotPlayer.url.includes(pl["ID STEAM"])); 
+              }
+              foundPlayer = {
+                ...foundPlayer,
+                ...playerInSpreadsheet,
+                ...gotPlayer
+              }
+              console.log(foundPlayer);
+
+              let matches;
+              // socket.emit("bring-player-matches", foundPlayer.insightsId);
+              // socket.on("player-matches",(data)=>{
+              //   console.log("llegó data", data);
+              //   // matches = data;
+                
+              //   // let htmlMatches = data.map(match => {
+
+              //   //   // return 
+              //   // })
+              // });
+              
+              let dataJson = await fetch(`/proxy?url=https://aoe-api.worldsedgelink.com/community/leaderboard/getRecentMatchHistory?title=age2&profile_ids=[${foundPlayer.insightsId}]`)
+              let profileResult = await dataJson.json();
+              console.log(profileResult);
+              
+              let profiles = profileResult.profiles;
+              let recentMatches = profileResult.matchHistoryStats;
+
+              recentMatches.sort((a,b)=> b.id - a.id);
+              console.log(recentMatches);
+              
+              recentMatches = recentMatches.map(match => {
+                let matchhistorymember = match.matchhistorymember;
+                let matchhistoryreportresults = match.matchhistoryreportresults;
+                matchhistoryreportresults = matchhistoryreportresults.map((m => {
+                  return {
+                    ...m,
+                    ...matchhistorymember.find(ma => ma.profile_id == m.profile_id),
+                    ...profiles.find(p => p.profile_id == m.profile_id)
+                  };
+                }))
+                
+                return {
+                  id: match.id,
+                  startTime: match.startgametime,
+                  endTime: match.completiontime,
+                  map: match.mapname,
+                  teamA: {
+                    status: matchhistoryreportresults.find(m => m.teamid == 0).resulttype,
+                    list: matchhistoryreportresults.filter(m => m.teamid == 0)
+                  },
+                  teamB: {
+                    status: matchhistoryreportresults.find(m => m.teamid == 1).resulttype,
+                    list: matchhistoryreportresults.filter(m => m.teamid == 1)
+                  }
+                }
+              })
+              console.log(recentMatches);
+              
+
+              if (foundPlayer) {
+                Swal.fire({
+                  html: `
+                    <div class="player-overlay">
+                      <div class="player-left">
+                        <picture>
+                            <img src="${getImage(foundPlayer.name)}" alt="${foundPlayer.name}">
+                        </picture>
+                        <h4>${foundPlayer.name}</h4>
+                        <i>${foundPlayer.name}</i>
+                      </div>
+                      <section>
+                          <div class="player-cards"></div>
+                          <h4 class="player-name"><i class="blue">Equipo</i> ${foundPlayer.name}</h4>
+                          <h4 class="player-elo"><i class="blue">Elo prom.</i> ${foundPlayer.elo || 2000-foundPlayer.id}</h4>
+                      </section>
+                      </div>
+                  `,
+                  showClass: {
+                      popup: `
+                        animate__animated
+                        animate__fadeIn
+                        animate__faster
+                      `
+                    },
+                    hideClass: {
+                      popup: `
+                        animate__animated
+                        animate__fadeOut
+                        animate__faster
+                      `
+                    },
+                  showCloseButton: true,
+                  showConfirmButton: false
+                  // confirmButtonAriaLabel: "Thumbs up, great!",
+                  // cancelButtonText: `
+                  //   <i class="fa fa-thumbs-down"></i>
+                  // `,
+                  // cancelButtonAriaLabel: "Thumbs down"
+                });
+              }
+              
+            })
+            // console.log(steamfetch);
+            // let steamdata = await steamfetch.json();
+            // console.log(playerData);
+            
+          });
+        })
+        
       }
     }
 
@@ -727,45 +736,49 @@ async function getImage(name) {
     // ASDASDASD
   }
 
-socket.on("players", (players) => {
-  console.log(players);
-  sessionStorage.setItem("players", JSON.stringify(players));
+  socket.on("players", (players) => {
+    console.log(players);
+    sessionStorage.setItem("players", JSON.stringify(players));
+    sessionData = players;
+    
+    loadDashboard(sessionData);
+  });
+
+  // let playerList = JSON.parse(sessionStorage.getItem("players"));
+  console.log(sessionData);
+
+  loadDashboard(sessionData);
+
+  function cleanButtons() {
+    let links = document.querySelectorAll(".nav-link");
+    links.forEach(link => link.classList.remove("active"));
+  }
+
+  document.querySelector("#rmtg-button").addEventListener("click",()=>{
+    activePage = "rmTg";
+    cleanButtons();
+    document.querySelector("#rmtg-button").classList.add("active");
+    loadDashboard(sessionData);
+  })
+
+  document.querySelector("#rm1v1-button").addEventListener("click",()=>{
+    activePage = "rm1v1";
+    cleanButtons();
+    document.querySelector("#rm1v1-button").classList.add("active");
+    loadDashboard(sessionData);
+  })
+
+  document.querySelector("#birthday-button").addEventListener("click",()=>{
+    activePage = "birthday";
+    cleanButtons();
+    document.querySelector("#birthday-button").classList.add("active");
+    loadDashboard(sessionData);
+  })
+
+  // updateButton.addEventListener("click", () => {
+  //   console.log("Actualizando...");
+    // updatePlayers();
+  // });
+
   
-  loadDashboard(players);
-});
-
-let playerList = JSON.parse(sessionStorage.getItem("players"));
-console.log(playerList);
-
-loadDashboard(playerList);
-
-function cleanButtons() {
-  let links = document.querySelectorAll(".nav-link");
-  links.forEach(link => link.classList.remove("active"));
-}
-
-document.querySelector("#rmtg-button").addEventListener("click",()=>{
-  activePage = "tg";
-  cleanButtons();
-  document.querySelector("#rmtg-button").classList.add("active");
-  loadDashboard(playerList);
 })
-
-document.querySelector("#rm1v1-button").addEventListener("click",()=>{
-  activePage = "1v1";
-  cleanButtons();
-  document.querySelector("#rm1v1-button").classList.add("active");
-  loadDashboard(playerList);
-})
-
-document.querySelector("#birthday-button").addEventListener("click",()=>{
-  activePage = "birthday";
-  cleanButtons();
-  document.querySelector("#birthday-button").classList.add("active");
-  loadDashboard(playerList);
-})
-
-// updateButton.addEventListener("click", () => {
-//   console.log("Actualizando...");
-  updatePlayers();
-// });

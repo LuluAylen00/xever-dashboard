@@ -1,7 +1,9 @@
 const express = require("express");
 const app = express();
 const fs = require("fs");
-const path = require("path")
+const path = require("path");
+
+const scrapper = require('./modules/scrapper');
 
 let port = process.env.PORT || 3418
 // app.listen(port, ()=> console.log("Servidor corriendo en el puerto "+port))
@@ -31,15 +33,14 @@ let maxCount = {
     time: Date.now()
 };
 let data = {
+    players: [],
     rm1v1: {
-        players: [],
         updateTime: Date.now(),
         min: null,
         max: null,
         avg: null
     },
     rmTg: {
-        players: [],
         updateTime: Date.now(),
         min: null,
         max: null,
@@ -76,40 +77,51 @@ io.on('connection', async (socket) => {
 
     socket.on("update-players", (incomingData) => {
         // Función para obtener el rating más bajo
-        function getLowestRating(players) {
-            return Math.min(...players.map(player => player.rating));
+        function getLowestRating(players, ladder) {
+            return Math.min(...players.map(player => player[ladder].rating));
         }
 
         // Función para obtener el rating más alto
-        function getHighestRating(players) {
-            return Math.max(...players.map(player => player.rating));
+        function getHighestRating(players, ladder) {
+            return Math.max(...players.map(player => player[ladder].rating));
         }
 
         // Función para obtener el promedio de rating
-        function getAverageRating(players) {
-            const ratings = players.map(player => player.rating);
+        function getAverageRating(players, ladder) {
+            const ratings = players.map(player => player[ladder].rating);
             return ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
         }
 
+        let playersTg = incomingData.filter(p => p.rmTg);
+        let players1v1 = incomingData.filter(p => p.rm1v1);
+
         data = {
+            players: incomingData,
             rm1v1: {
-                players: incomingData.rm1v1,
-                length: incomingData.rm1v1.length,
-                min: getLowestRating(incomingData.rm1v1),
-                max: getHighestRating(incomingData.rm1v1),
-                avg: getAverageRating(incomingData.rm1v1),
+                length: players1v1.length,
+                min: getLowestRating(players1v1, "rm1v1"),
+                max: getHighestRating(players1v1, "rm1v1"),
+                avg: getAverageRating(players1v1, "rm1v1"),
                 updateTime: Date.now(),
             },
             rmTg: {
-                players: incomingData.rmTg,
-                length: incomingData.rmTg.length,
-                min: getLowestRating(incomingData.rmTg),
-                max: getHighestRating(incomingData.rmTg),
-                avg: getAverageRating(incomingData.rmTg),
+                length: playersTg.length,
+                min: getLowestRating(playersTg, "rmTg"),
+                max: getHighestRating(playersTg, "rmTg"),
+                avg: getAverageRating(playersTg, "rmTg"),
                 updateTime: Date.now(),
             }
         };
         io.sockets.emit("players", data);
+    })
+
+    socket.on("bring-player-matches", async (insightsId) => {
+        console.log("Llegó una petición a.... "+insightsId);
+        
+        let matches = await scrapper.getInsightsMatches(insightsId);
+        console.log(matches);
+        
+        socket.emit("player-matches", matches);
     })
     // socket.on("messages-list", () =>{
     //     io.sockets.emit("messages", mensajes);
@@ -128,7 +140,14 @@ app.use(express.json());
 app.use(express.static(path.resolve(__dirname, "../public")));
 
 app.get('/proxy', async (req, res) => {
-    const url = `${req.query.url}&platform=${req.query.platform}&title=${req.query.title}&sortBy=${req.query.sortBy}&start=${req.query.start}&count=${req.query.count}`;
+    let url;
+    // console.log(req.query);
+    
+    if (req.query.type == "default") {
+        url = `${req.query.url}&platform=${req.query.platform}&title=${req.query.title}&sortBy=${req.query.sortBy}&start=${req.query.start}&count=${req.query.count}`;
+    } else {
+        url = `${req.query.url}&title=${req.query.title}&profile_ids=${req.query.profile_ids}`;
+    }
     // console.log(url);
     
     try {
