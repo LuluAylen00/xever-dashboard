@@ -170,7 +170,7 @@ app.get("/api/profile/:id", async (req, res) => {
 });
 app.use("/", require("./router/index"));
 
-scrapper.getInsightsMatches("2826785");
+// scrapper.getInsightsMatches("2826785");
 
 // app.use("/sorteo", require("./router/index"));
 // app.use("/brackets", require("./router/index"));
