@@ -59,7 +59,11 @@ module.exports = {
     fs.writeFileSync('../data/xever-data.json', JSON.stringify(allPlayers, null, 2));
   },
   getInsightsMatches: async (insightsId) => {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'], // Importante en entornos restringidos
+      userDataDir: './puppeteer_cache',
+    });
     const page = await browser.newPage();
     
     // let allPlayers = [];
