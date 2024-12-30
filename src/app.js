@@ -119,7 +119,7 @@ io.on('connection', async (socket) => {
         console.log("Llegó una petición a.... "+insightsId);
         
         let matches = await scrapper.getInsightsMatches(insightsId);
-        console.log(matches);
+        // console.log(matches);
         
         socket.emit("player-matches", matches);
     })
@@ -162,7 +162,15 @@ app.get('/proxy', async (req, res) => {
     }
   });
 
+app.get("/api/profile/:id", async (req, res) => {
+    res.send ({
+        status: 200,
+        data: await scrapper.getInsightsMatches(req.params.id)
+    })
+});
 app.use("/", require("./router/index"));
+
+// scrapper.getInsightsMatches("2826785");
 
 // app.use("/sorteo", require("./router/index"));
 // app.use("/brackets", require("./router/index"));

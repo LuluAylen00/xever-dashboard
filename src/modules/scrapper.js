@@ -66,60 +66,87 @@ module.exports = {
   
     // Iterar sobre las páginas (en este caso, de 1 a 435)
     // for (let i = 1; i <= 435; i++) {
-    console.log(insightsId);
+    // console.log(insightsId);
     
       await page.goto(`https://www.aoe2insights.com/user/${insightsId}`);
-      let matches = [];
       // Extraer datos de jugadores
+      // let matches = [];
+
       let players = await page.evaluate(() => {
-        console.log("Empezamos a evaluar...");
-        
-          return Array.from(document.querySelectorAll('.match-line')).map(row => {
-            
+          // let matches2 = [];
+          console.log("Empezamos a evaluar...");
+          // matches.push({a: "asd"});
+          // matches2.push({a: "asd"});
+          // return matches;
+          // let divs = document.querySelectorAll('.match-line')
+          // console.log(divs);
+          
+          // let matches3 = Array.from(document.querySelectorAll('.match-tile')).map(m => {
+          //   matches2.push({a: "a"})
+          //   return {a: "a"}
+          // })
+          // return matches2;
+          let matches = Array.from(document.querySelectorAll('.match-tile')).map(row => {
+            // return {a: "asd"};
             let matchData = row.querySelector("div");
             // let teams = row.querySelectorAll(".teams");
+            let matchDataExtra = matchData.querySelectorAll("div");
+
+            let matchDataExtraDurationAndDate = matchDataExtra[3].querySelectorAll("div");
+
+            let matchTeams = row.querySelectorAll(".team");
             // return 
             let matchComplete = {
               mapIcon: matchData.querySelector("picture img").getAttribute("src"),
-              matchMode: matchData.querySelector("div:firstChild strong em").innerHTML,
-              mapName: matchData.querySelector("div:nthChild(2)").innerHTML,
-              matchDuration: matchData.querySelector("div:nthChild(3):firstChild "),
-              matchDate: matchData.querySelector("div:nthChild(3):lastChild"),
+              matchMode: matchDataExtra[0].querySelector("a.stretched-link strong em") ? matchDataExtra[0].querySelector("a.stretched-link strong em").innerHTML.replaceAll("\n", "").trim() : "---",
+              mapName: matchDataExtra[2] ? matchDataExtra[2].innerHTML.replaceAll("\n", "").trim() : "---",
+              // matchDataExtraDurationAndDate: matchDataExtra[3].innerHTML,
+              matchDuration: matchDataExtraDurationAndDate[0].querySelector("small") ?  matchDataExtraDurationAndDate[0].querySelector("small").innerHTML : "---",
+              matchDate: matchDataExtraDurationAndDate[1].querySelector("small span") ? matchDataExtraDurationAndDate[1].querySelector("small span").innerHTML.replace("&nbsp;", " ") : "---",
               teamA: {
-                status: row.querySelectorAll(".teams").classList.includes("won"),
-                list: row.querySelectorAll(".teams:firstChild > li > div").map(everyPlayerDiv => {
+                status: row.querySelectorAll(".team")[0].classList.contains("won"),
+                list: Array.from(row.querySelectorAll(".team")[0].querySelectorAll("li")).map(everyPlayerDiv => {
                   return {
-                    name: everyPlayerDiv.querySelector("a").innerHTML,
-                    color: everyPlayerDiv.getAttribute("class").split(" ")[1],
-                    civIcon: everyPlayerDiv.querySelector("i picture img").getAttribute("src"),
-                    playerElo: everyPlayerDiv.querySelector(".rating span").innerHTML,
-                    eloVariation: everyPlayerDiv.querySelector(".rating span.rating-change").innerHTML
+                    // d: everyPlayerDiv.querySelector("div").querySelector("div").outerHTML,
+                    // di: everyPlayerDiv.querySelector("div").innerHTML,
+                    name: everyPlayerDiv.querySelector("div").querySelector("a") ? everyPlayerDiv.querySelector("div").querySelector("a").innerHTML.replaceAll("\n", "").trim() : "---",
+                    color: everyPlayerDiv.querySelector("div").getAttribute("class").split(" ")[1].split("-")[3],
+                    civIcon: everyPlayerDiv.querySelector("div").querySelector("i picture img").getAttribute("src"),
+                    // playerElo: everyPlayerDiv.querySelector("div").querySelector("div.appendix small.rating span").innerHTML,
+                    // eloVariation: everyPlayerDiv.querySelector("div").querySelector(".rating span.rating-change").innerHTML
                   }
                 })
+                // list: matchTeams[0].querySelectorAll("li")
               },
               teamB: {
-                status: row.querySelectorAll(".teams").classList.includes("won"),
-                list: row.querySelectorAll(".teams:lastChild > li > div").map(everyPlayerDiv => {
+                status: row.querySelectorAll(".team")[1].classList.contains("won"),
+                list: Array.from(row.querySelectorAll(".team")[1].querySelectorAll("li")).map(everyPlayerDiv => {
                   return {
-                    name: everyPlayerDiv.querySelector("a").innerHTML,
-                    color: everyPlayerDiv.getAttribute("class").split(" ")[1],
-                    civIcon: everyPlayerDiv.querySelector("i picture img").getAttribute("src"),
-                    playerElo: everyPlayerDiv.querySelector(".rating span").innerHTML,
-                    eloVariation: everyPlayerDiv.querySelector(".rating span.rating-change").innerHTML
+                    // d: everyPlayerDiv.querySelector("div").querySelector("div").outerHTML,
+                    // di: everyPlayerDiv.querySelector("div").innerHTML,
+                    name: everyPlayerDiv.querySelector("div").querySelector("a") ? everyPlayerDiv.querySelector("div").querySelector("a").innerHTML.replaceAll("\n", "").trim() : "---",
+                    color: everyPlayerDiv.querySelector("div").getAttribute("class").split(" ")[1].split("-")[3],
+                    civIcon: everyPlayerDiv.querySelector("div").querySelector("i picture img").getAttribute("src"),
+                    // playerElo: everyPlayerDiv.querySelector("div").querySelector("div.appendix small.rating span").innerHTML,
+                    // eloVariation: everyPlayerDiv.querySelector("div").querySelector(".rating span.rating-change").innerHTML
                   }
                 })
-              }
+                // list: matchTeams[0].querySelectorAll("li")
+              },
             }
-            console.log(matchComplete);
+            // console.log(matchComplete);
             
-            // matches.push()
-
+            // matches.push({a: "asd"})
+            // return {a: "asd"}
             return matchComplete;
-          });
+          })
+          return matches;
       });
       
       // players = players.filter((pl) => pl.name.includes('XEVER | '))
-      console.log("players",players);
+      // console.log("players",players[0]);
+      // console.log("playersasdasd",players[0].teamA.list);
+      // console.log("matches",matches);
       
       
       

@@ -73,6 +73,7 @@ async function getImage(name) {
       // console.log(steamdata);
       
       let img = steamdata.find(pl => pl.name == name).image;
+      
       if (img.includes("/static/")){
         img = "https://www.aoe2insights.com" + img;
       }
@@ -615,15 +616,15 @@ window.addEventListener("load", async ()=> {
               let foundPlayer = resultPlayers.find(pl => pl.name == tableRow.dataset.name);
               // console.log(totalPlayers);
               
-              let gotPlayer = mergeUniquePlayers(totalPlayers).find(pl => pl.name == tableRow.dataset.name);
+              let gotPlayer = sessionData.players.find(pl => pl.name == tableRow.dataset.name);
               
-              let playerInSpreadsheet = {};
-              if (gotPlayer) {
-               playerInSpreadsheet = spreadsheet.find(pl => gotPlayer.url.includes(pl["ID STEAM"])); 
-              }
+              // let playerInSpreadsheet = {};
+              // if (gotPlayer) {
+              //  playerInSpreadsheet = spreadsheet.find(pl => gotPlayer.url.includes(pl["ID STEAM"])); 
+              // }
               foundPlayer = {
                 ...foundPlayer,
-                ...playerInSpreadsheet,
+                // ...playerInSpreadsheet,
                 ...gotPlayer
               }
               console.log(foundPlayer);
@@ -640,60 +641,224 @@ window.addEventListener("load", async ()=> {
               //   // })
               // });
               
-              let dataJson = await fetch(`/proxy?url=https://aoe-api.worldsedgelink.com/community/leaderboard/getRecentMatchHistory?title=age2&profile_ids=[${foundPlayer.insightsId}]`)
-              let profileResult = await dataJson.json();
-              console.log(profileResult);
-              
-              let profiles = profileResult.profiles;
-              let recentMatches = profileResult.matchHistoryStats;
-
-              recentMatches.sort((a,b)=> b.id - a.id);
-              console.log(recentMatches);
-              
-              recentMatches = recentMatches.map(match => {
-                let matchhistorymember = match.matchhistorymember;
-                let matchhistoryreportresults = match.matchhistoryreportresults;
-                matchhistoryreportresults = matchhistoryreportresults.map((m => {
-                  return {
-                    ...m,
-                    ...matchhistorymember.find(ma => ma.profile_id == m.profile_id),
-                    ...profiles.find(p => p.profile_id == m.profile_id)
-                  };
-                }))
+              if (foundPlayer && foundPlayer.insightsId) {
+                /* 
+                let dataJson = await fetch(`/proxy?url=https://aoe-api.worldsedgelink.com/community/leaderboard/getRecentMatchHistory?title=age2&profile_ids=[${foundPlayer.insightsId}]`)
+                let profileResult = await dataJson.json();
+                console.log(profileResult);
                 
-                return {
-                  id: match.id,
-                  startTime: match.startgametime,
-                  endTime: match.completiontime,
-                  map: match.mapname,
-                  teamA: {
-                    status: matchhistoryreportresults.find(m => m.teamid == 0).resulttype,
-                    list: matchhistoryreportresults.filter(m => m.teamid == 0)
-                  },
-                  teamB: {
-                    status: matchhistoryreportresults.find(m => m.teamid == 1).resulttype,
-                    list: matchhistoryreportresults.filter(m => m.teamid == 1)
+                let profiles = profileResult.profiles;
+                let recentMatches = profileResult.matchHistoryStats;
+
+                recentMatches.sort((a,b)=> b.id - a.id);
+                console.log(recentMatches);
+                
+                recentMatches = recentMatches.map(match => {
+                  let matchhistorymember = match.matchhistorymember;
+                  let matchhistoryreportresults = match.matchhistoryreportresults;
+                  matchhistoryreportresults = matchhistoryreportresults.map((m => {
+                    return {
+                      ...m,
+                      ...matchhistorymember.find(ma => ma.profile_id == m.profile_id),
+                      ...profiles.find(p => p.profile_id == m.profile_id)
+                    };
+                  }))
+
+                  
+                //   function sanitizeBase64(base64String) {
+                //     return base64String.replace(/[\n\r\s]/g, '');
+                // }
+                function decompressGzipBase64(base64Compressed) {
+                  try {
+                      const fixedBase64 = fixBase64Length(base64Compressed);
+                      const binaryString = atob(fixedBase64);
+                      // console.log("binary string",binaryString);
+                      
+                      const binaryData = Uint8Array.from(binaryString, char => char.charCodeAt(0));
+                      // console.log("binary data",binaryData);
+
+                      const decompressedData = pako.inflate(binaryData, { to: 'string' });
+                      // console.log("decompressed data",decompressedData);
+
+                      // const asdasd = atob(decompressedData);
+                      // console.log(asdasd);
+                      
+                      return decompressedData;
+                  } catch (error) {
+                      console.error("Error al descomprimir y decodificar:", error);
+                      return null;
                   }
+              }
+              
+              // function decodeBase64(base64String) {
+              //   var byteCharacters = atob(base64String);
+              //   var byteNumbers = new Array(byteCharacters.length);
+              //   for (var i = 0; i < byteCharacters.length; i++) {
+              //     byteNumbers[i] = byteCharacters.charCodeAt(i);
+              //   }
+  
+              //   var byteArray = new Uint8Array(byteNumbers);
+              //   var blob = new Blob([ byteArray ], {
+              //     type : undefined
+              //   });
+
+              //   // console.log(byteArray, blob);
+                
+              //   return blob;
+              // }
+              
+              function fixBase64Length(base64String) {
+                  const padding = base64String.length % 4;
+                  if (padding !== 0) {
+                      base64String += '='.repeat(4 - padding);
+                  }
+                  return base64String;
+              }
+              
+              // function sanitizeBase64(base64String) {
+              //     return base64String.replace(/[\n\r\s]/g, '');
+              // }
+              
+              // Tu cadena comprimida
+              // const compressedBase64Input = `eNpFUs1upDAMfpc+AQw0Ug89MAqtspWdMpsZiT0uXbE1q2WkdgTk6evECeVkYn8//rn72XQNfwdws28WjnSjYElvdL0dQ6inzRIskm/V7zHma/TX+2OIdL9YatoQopsUCGdt3fUmmE7h6SO8lcw5d//eXi/FpX07fF6c//W3I9Sn94fbS/nj9OqKxDOvsJwF4+YKk0/U7ClqTgf7f4q1Vp+z5j3jNsmPex7dqEA8HywNlXgaFHTxrUTKmL7cMdSrP91Z+qB2gwYiP/dpQgCO5+RYj8bn6MEB/5tN5jUW9r1YU+xjLPwVcyX+UWGXPLm5lPzAc2yfYt63gf9JtIxCJ/OFoCO+VtRzBU0vcZgXnVNNn3tb0c+1cLehDyPcJnAvoDPnvrMN9Jx8m9VSvwjW8P6NeCFQSM2z8MSey1RfcE2uL3MfwHNEMqJDQ76tir3XxzHW1gGX9D1Svqlh34V1+8157idpTDxL4UUfdpV26TK+W3Pe8q4Svvq+2aH+vo8h91+Fmz3G+xh5F9M+I8t3j+K9Bto9BI7Huy+rsPqW`;
+              // const compressedBase64Input = `eNpFUs1upDAMfpc+AQw0Ug89MAqtspWdMpsZiT0uXbE1q2WkdgTk6evECeVkYn8//rn72XQNfwdws28WjnSjYElvdL0dQ6inzRIskm/V7zHma/TX+2OIdL9YatoQopsUCGdt3fUmmE7h6SO8lcw5d//eXi/FpX07fF6c//W3I9Sn94fbS/nj9OqKxDOvsJwF4+YKk0/U7ClqTgf7f4q1Vp+z5j3jNsmPex7dqEA8HywNlXgaFHTxrUTKmL7cMdSrP91Z+qB2gwYiP/dpQgCO5+RYj8bn6MEB/5tN5jUW9r1YU+xjLPwVcyX+UWGXPLm5lPzAc2yfYt63gf9JtIxCJ/OFoCO+VtRzBU0vcZgXnVNNn3tb0c+1cLehDyPcJnAvoDPnvrMN9Jx8m9VSvwjW8P6NeCFQSM2z8MSey1RfcE2uL3MfwHNEMqJDQ76tir3XxzHW1gGX9D1Svqlh34V1+8157idpTDxL4UUfdpV26TK+W3Pe8q4Svvq+2aH+vo8h91+Fmz3G+xh5F9M+I8t3j+K9Bto9BI7Huy+rsPqW`;
+              
+              const step1Decompressed = decompressGzipBase64(match.options);
+              // console.log("Paso 1 - Gzip descomprimido:", step1Decompressed);
+
+              // Función para decodificar base64 de forma segura
+              function decodeBase64ToText(base64String) {
+                // Limpiar la cadena base64 (eliminar saltos de línea y espacios)
+                base64String = base64String.replace(/[\r\n]/g, '').replace(/\s/g, '');
+                
+                // Agregar padding si es necesario
+                while (base64String.length % 4) {
+                    base64String += '=';
                 }
-              })
-              console.log(recentMatches);
+                
+                // Intentar decodificar el base64
+                try {
+                    return atob(base64String);
+                } catch (e) {
+                    console.error('Error al decodificar Base64:', e);
+                    return null;
+                }
+              }
+
+              // Ejemplo de uso con el string que proporcionaste
+              // const base64String = "SAQAAAA2MTozAwAAADA6MwQAAAA2MjpuBQAAADkyOjMwAwAAADE6bgQAAAA4Nzp5BAAAADYwOjAEAAAANTk6MAQAAAA4OTpuAwAAADQ6NRsAAAA1MjpoQldPV0VEd2tVTzZhQjNDRi9uK1JRPT0EAAAANToxMwUAAAA1MTo3NAQAAAA2NDpuBAAAADk2OnkEAAAAODU6MAQAAAA5NToyBAAAADg2OnkEAAAANTg6MgQAAAA2Ojc3AwAAADc6MQQAAAA1NjoyBAAAADY1OnkEAAAANjY6eQUAAAA4OjEyMAMAAAA5OjAIAAAAMTA6MTA5NjgGAAAAOTM6MTIyBQAAADg0Oi0xBQAAADgzOi0xBAAAADY3OjEEAAAANjg6NQQAAAA2OTo1BAAAADcwOjEFAAAANzE6MTAFAAAAMTI6NTAEAAAAMTM6MQUAAAAxNDo3MAYAAAAxNToxMjUEAAAAMTY6MQQAAAAxNzo4BAAAADE4OjEIAAAANzI6MTAwMDAEAAAAMTk6MAQAAAAyMDoxBQAAADIxOjYwBAAAADIyOjIFAAAAMjM6NjAGAAAANzM6MTI1BQAAADI0OjIwBAAAADI1OjEFAAAAMjY6NjIEAAAAMjc6MwQAAAA3NDo4BgAAADI4OjIwMAQAAAAzNjp5BAAAADc1OnkEAAAAOTE6bgQAAAAzNzowBAAAADk3OjIEAAAANzY6eQQAAAA1NTp5BAAAADQxOjIEAAAAOTA6bgQAAAA3Nzp5BAAAADc4OnkEAAAANTc6MAQAAAA3OTpuBwAAADgwOjkwMDAEAAAAODE6NwQAAAA4MjowBAAAADk4Onk=";
+              // "SAQAAAA2MTozAwAAADA6MwQAAAA2MjpuBQAAADkyOjMwAwAAADE6bgQAAAA4Nzp5BAAAADYwOjAEAAAANTk6MAQAAAA4OTpuAwAAADQ6NRsAAAA1MjpoQldPV0VEd2tVTzZhQjNDRi9uK1JRPT0EAAAANToxMwUAAAA1MTo3NAQAAAA2NDpuBAAAADk2OnkEAAAAODU6MAQAAAA5NToyBAAAADg2OnkEAAAANTg6MgQAAAA2Ojc3AwAAADc6MQQAAAA1NjoyBAAAADY1OnkEAAAANjY6eQUAAAA4OjEyMAMAAAA5OjAIAAAAMTA6MTA5NjgGAAAAOTM6MTIyBQAAADg0Oi0xBQAAADgzOi0xBAAAADY3OjEEAAAANjg6NQQAAAA2OTo1BAAAADcwOjEFAAAANzE6MTAFAAAAMTI6NTAEAAAAMTM6MQUAAAAxNDo3MAYAAAAxNToxMjUEAAAAMTY6MQQAAAAxNzo4BAAAADE4OjEIAAAANzI6MTAwMDAEAAAAMTk6MAQAAAAyMDoxBQAAADIxOjYwBAAAADIyOjIFAAAAMjM6NjAGAAAANzM6MTI1BQAAADI0OjIwBAAAADI1OjEFAAAAMjY6NjIEAAAAMjc6MwQAAAA3NDo4BgAAADI4OjIwMAQAAAAzNjp5BAAAADc1OnkEAAAAOTE6bgQAAAAzNzowBAAAADk3OjIEAAAANzY6eQQAAAA1NTp5BAAAADQxOjIEAAAAOTA6bgQAAAA3Nzp5BAAAADc4OnkEAAAANTc6MAQAAAA3OTpuBwAAADgwOjkwMDAEAAAAODE6NwQAAAA4MjowBAAAADk4Onk="
+              // "SAQAAAA2MTozAwAAADA6MwQAAAA2MjpuBQAAADkyOjMwAwAAADE6bgQAAAA4Nzp5BAAAADYwOjAEAAAANTk6MAQAAAA4OTpuAwAAADQ6NRsAAAA1MjpoQldPV0VEd2tVTzZhQjNDRi9uK1JRPT0EAAAANToxMwUAAAA1MTo3NAQAAAA2NDpuBAAAADk2OnkEAAAAODU6MAQAAAA5NToyBAAAADg2OnkEAAAANTg6MgQAAAA2Ojc3AwAAADc6MQQAAAA1NjoyBAAAADY1OnkEAAAANjY6eQUAAAA4OjEyMAMAAAA5OjAIAAAAMTA6MTA5NjgGAAAAOTM6MTIyBQAAADg0Oi0xBQAAADgzOi0xBAAAADY3OjEEAAAANjg6NQQAAAA2OTo1BAAAADcwOjEFAAAANzE6MTAFAAAAMTI6NTAEAAAAMTM6MQUAAAAxNDo3MAYAAAAxNToxMjUEAAAAMTY6MQQAAAAxNzo4BAAAADE4OjEIAAAANzI6MTAwMDAEAAAAMTk6MAQAAAAyMDoxBQAAADIxOjYwBAAAADIyOjIFAAAAMjM6NjAGAAAANzM6MTI1BQAAADI0OjIwBAAAADI1OjEFAAAAMjY6NjIEAAAAMjc6MwQAAAA3NDo4BgAAADI4OjIwMAQAAAAzNjp5BAAAADc1OnkEAAAAOTE6bgQAAAAzNzowBAAAADk3OjIEAAAANzY6eQQAAAA1NTp5BAAAADQxOjIEAAAAOTA6bgQAAAA3Nzp5BAAAADc4OnkEAAAANTc6MAQAAAA3OTpuBwAAADgwOjkwMDAEAAAAODE6NwQAAAA4MjowBAAAADk4Onk="
+
+              // Llamamos a la función para obtener el texto
+              // const decodedText = decodeBase64ToText(base64String);
+
+              // Mostramos el resultado
+              // if (decodedText) {
+
+                // console.log("PREVIOUS decodedText",base64String);
+                // console.log("decodedText",decodedText);
+                // console.log("PREVIOUS decodedText2",decompressGzipBase64(match.options).replaceAll('"', ""));
+                // console.log("decodedText2",decodeBase64ToText(decompressGzipBase64(match.options).replaceAll('"', "")));
+              //   // console.log(decodedText);
+              // } else {
+              //   console.error("No se pudo decodificar el texto.");
+              // }
+              
+              if (step1Decompressed) {
+                // console.log(atob(step1Decompressed).replace(/\+/g, " "));
+                  // const sanitizedDecompressed = sanitizeBase64();
+                  // console.log(step1Decompressed == decodedText);
+                  // console.log(match.options);
+                  console.log(decompressGzipBase64(match.options).replaceAll('"', ""));
+                  
+                  const finalDecodedResult = decodeBase64ToText(decompressGzipBase64(match.options).replaceAll('"', ""));
+
+                  
+                  console.log("Resultado final:", finalDecodedResult);
+              }
+
+
               
 
-              if (foundPlayer) {
+              
+              
+              
+                
+                  
+                  return {
+                    id: match.id,
+                    startTime: match.startgametime,
+                    endTime: match.completiontime,
+                    map: match.mapname,
+                    decodedInfo: decodeBase64ToText(decompressGzipBase64(match.options).replaceAll('"', "")),
+                    // slotInfo: decodeBase64ToText(decompressGzipBase64(match.slotinfo).replaceAll('"', "")),
+                    teamA: {
+                      status: matchhistoryreportresults.find(m => m.teamid == 0).resulttype,
+                      list: matchhistoryreportresults.filter(m => m.teamid == 0)
+                    },
+                    teamB: {
+                      status: matchhistoryreportresults.find(m => m.teamid == 1).resulttype,
+                      list: matchhistoryreportresults.filter(m => m.teamid == 1)
+                    }
+                  }
+                })
+                console.log(recentMatches);
+                console.log(recentMatches[0].decodedInfo);
+                console.log(recentMatches[0].decodedInfo.replaceAll("\u0000","---").replaceAll("\u0001","---").replaceAll("\u0002","---").replaceAll("\u0003","---").replaceAll("\u0004","---").replaceAll("\u0005","---").replaceAll("\u0006","---").replaceAll("\u0007","---").replaceAll("\u0008","---").replaceAll("\u0009","---").split("---").filter(asd => asd.length > 0));
+                */
+                // console.log(recentMatches[0].slotInfo);
+                // console.log(recentMatches[0].slotInfo.replaceAll("\u0000","---").replaceAll("\u0001","---").replaceAll("\u0002","---").replaceAll("\u0003","---").replaceAll("\u0004","---").replaceAll("\u0005","---").replaceAll("\u0006","---").replaceAll("\u0007","---").replaceAll("\u0008","---").replaceAll("\u0009","---").split("---").filter(asd => asd.length > 0));
+                console.log(foundPlayer);
+                // socket.emit("bring-player-matches", foundPlayer.insightsId);
                 Swal.fire({
                   html: `
                     <div class="player-overlay">
                       <div class="player-left">
                         <picture>
-                            <img src="${getImage(foundPlayer.name)}" alt="${foundPlayer.name}">
+                            <img src="${await getImage(foundPlayer.name)}" alt="${foundPlayer.name}">
                         </picture>
-                        <h4>${foundPlayer.name}</h4>
-                        <i>${foundPlayer.name}</i>
+                        ${
+                          foundPlayer.nick 
+                          ?
+                            `
+                              <h4>${foundPlayer.nick}</h4>
+                              <i>${foundPlayer.name}</i>
+                            `
+                          :
+                            `
+                              <h4>${foundPlayer.name}</h4>
+                            `
+
+                        }
                       </div>
-                      <section>
-                          <div class="player-cards"></div>
-                          <h4 class="player-name"><i class="blue">Equipo</i> ${foundPlayer.name}</h4>
-                          <h4 class="player-elo"><i class="blue">Elo prom.</i> ${foundPlayer.elo || 2000-foundPlayer.id}</h4>
+                      <section class="player-right">
+                          <div class="player-cards">
+                            <div class="card-1v1">
+                              <div class="card-title">1v1 RM</div>
+                              <div class="card-rank">${foundPlayer.rm1v1 ? "#"+foundPlayer.rm1v1.rank : "-"}</div>
+                              <div class="card-rating">Rating ${foundPlayer.rm1v1 ? "#"+foundPlayer.rm1v1.rating : "-"}</div>
+                              <div class="card-alltimehigh">All Time High ${foundPlayer.rm1v1 ? "#"+foundPlayer.rm1v1.highestrating : "-"}</div>
+                            </div>
+                            <div class="card-tg">
+                              <div class="card-title">Team RM</div>
+                              <div class="card-rank">${foundPlayer.rmTg ? "#"+foundPlayer.rmTg.rank : "-"}</div>
+                              <div class="card-rating">Rating ${foundPlayer.rmTg ? "#"+foundPlayer.rmTg.rating : "-"}</div>
+                              <div class="card-alltimehigh">All Time High ${foundPlayer.rmTg ? "#"+foundPlayer.rmTg.highestrating : "-"}</div>
+                            </div>
+                            <div class="card-birthday">
+                              <i class="fas fa-birthday-cake"></i>
+                              <div>
+                                <h5 class="card-title">Cumpleaños</h5>
+                                <p class="card-text">${foundPlayer.birthday ? foundPlayer.birthday.rating : "No tiene :("}</p>
+                              </div>
+                            </div>
+                          </div>
+                          <ul class="player-matches">
+                              <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                              </div>
+                          </ul>
                       </section>
                       </div>
                   `,
@@ -719,7 +884,63 @@ window.addEventListener("load", async ()=> {
                   // `,
                   // cancelButtonAriaLabel: "Thumbs down"
                 });
+                // socket.on("player-matches",async (data)=>{
+                //   console.log(data);
+                //   document.querySelector(".player-matches").innerHTML = "Asd";
+                  
+                // });
+
+                let dataFetched = await fetch(`/api/profile/${foundPlayer.insightsId}`);
+                let dataJson = await dataFetched.json()
+                  .then(resp => {
+                    let matchesDiv = document.querySelector(".player-matches");
+                    matchesDiv.innerHTML = "Asd";
+                    console.log(resp.data);
+                    resp.data.forEach(match => {
+                      matchesDiv.innerHTML += `
+                        <li class="every-match">
+                          <img src="https://www.aoe2insights.com/${match.mapIcon}" alt="" />
+                          <div class="every-match-info">
+                            <span class="match-mode">${match.matchMode}</span>
+                            <span class="match-map">${match.mapName}</span>
+                            <span class="match-duration">${match.matchDuration}</span>
+                            <span class="match-date">${match.matchDate}</span>
+                          </div>
+                          <div class="every-match-teams">
+                            <ul class="team-one ${match.teamA.status ? "won" : "" }"> 
+                              ${
+                                match.teamA.list.map(play => {
+                                  return `<li>
+                                      <span class="player-color color-${play.color}"></span>
+                                      <img src="https://www.aoe2insights.com/${play.civIcon}" />
+                                      <span class="player-name">${play.name}</span>
+                                    </li>`
+                                })
+                              }
+                              <span class="won-detail"><i class="fas fa-crown"></i></span>
+                            </ul>
+                            <span class="vs">vs</span>
+                            <ul class="team-two ${match.teamB.status ? "won" : "" }"> 
+                              ${
+                                match.teamB.list.map(play => {
+                                  return `<li>
+                                      <span class="player-name">${play.name}</span>
+                                      <img src="https://www.aoe2insights.com/${play.civIcon}" />
+                                      <span class="player-color color-${play.color}"></span>
+                                    </li>`
+                                })
+                              }
+                              <span class="won-detail"><i class="fas fa-crown"></i></span>
+                            </ul>
+                          </div>
+                        </li>
+                      `;
+                    });
+                  })
+                // console.log(dataJson);
+
               }
+
               
             })
             // console.log(steamfetch);
