@@ -819,11 +819,11 @@ window.addEventListener("load", async ()=> {
                             <img src="${await getImage(foundPlayer.name)}" alt="${foundPlayer.name}">
                         </picture>
                         ${
-                          foundPlayer.nick 
+                          foundPlayer.alias 
                           ?
                             `
-                              <h4>${foundPlayer.nick}</h4>
-                              <i>${foundPlayer.name}</i>
+                              <h4>${foundPlayer.name}</h4>
+                              <i>${foundPlayer.alias}</i>
                             `
                           :
                             `
@@ -831,6 +831,7 @@ window.addEventListener("load", async ()=> {
                             `
 
                         }
+                        <a href="https://www.aoe2insights.com/user/${foundPlayer.insightsId}" target="_blank">Perfil en AoE2Insights <i class="fas fa-chevron-circle-right"></i></a>
                       </div>
                       <section class="player-right">
                           <div class="player-cards">
@@ -850,7 +851,7 @@ window.addEventListener("load", async ()=> {
                               <i class="fas fa-birthday-cake"></i>
                               <div>
                                 <h5 class="card-title">Cumpleaños</h5>
-                                <p class="card-text">${foundPlayer.birthday ? foundPlayer.birthday.rating : "No tiene :("}</p>
+                                <p class="card-text">${foundPlayer.birthday ? foundPlayer.birthday : "No tiene :("}</p>
                               </div>
                             </div>
                           </div>
@@ -894,11 +895,12 @@ window.addEventListener("load", async ()=> {
                 let dataJson = await dataFetched.json()
                   .then(resp => {
                     let matchesDiv = document.querySelector(".player-matches");
-                    matchesDiv.innerHTML = "Asd";
+                    matchesDiv.innerHTML = "";
                     console.log(resp.data);
                     resp.data.forEach(match => {
                       matchesDiv.innerHTML += `
                         <li class="every-match">
+                          <a href="https://www.aoe2insights.com${match.url}" target="_blank" class="match-link"></a>
                           <img src="https://www.aoe2insights.com/${match.mapIcon}" alt="" />
                           <div class="every-match-info">
                             <span class="match-mode">${match.matchMode}</span>
@@ -909,26 +911,26 @@ window.addEventListener("load", async ()=> {
                           <div class="every-match-teams">
                             <ul class="team-one ${match.teamA.status ? "won" : "" }"> 
                               ${
-                                match.teamA.list.map(play => {
+                                String(match.teamA.list.map(play => {
                                   return `<li>
                                       <span class="player-color color-${play.color}"></span>
                                       <img src="https://www.aoe2insights.com/${play.civIcon}" />
                                       <span class="player-name">${play.name}</span>
                                     </li>`
-                                })
+                                })).replaceAll(">,<", "><")
                               }
                               <span class="won-detail"><i class="fas fa-crown"></i></span>
                             </ul>
                             <span class="vs">vs</span>
                             <ul class="team-two ${match.teamB.status ? "won" : "" }"> 
                               ${
-                                match.teamB.list.map(play => {
+                                String(match.teamB.list.map(play => {
                                   return `<li>
                                       <span class="player-name">${play.name}</span>
                                       <img src="https://www.aoe2insights.com/${play.civIcon}" />
                                       <span class="player-color color-${play.color}"></span>
                                     </li>`
-                                })
+                                })).replaceAll(">,<", "><")
                               }
                               <span class="won-detail"><i class="fas fa-crown"></i></span>
                             </ul>

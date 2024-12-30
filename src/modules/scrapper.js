@@ -98,7 +98,9 @@ module.exports = {
             // return 
             let matchComplete = {
               mapIcon: matchData.querySelector("picture img").getAttribute("src"),
-              matchMode: matchDataExtra[0].querySelector("a.stretched-link strong em") ? matchDataExtra[0].querySelector("a.stretched-link strong em").innerHTML.replaceAll("\n", "").trim() : "---",
+              matchMode: matchDataExtra[0].querySelector("a.stretched-link strong em") ? matchDataExtra[0].querySelector("a.stretched-link strong em").innerHTML.replaceAll("\n", "").trim() : matchDataExtra[0].querySelector("a.stretched-link strong").innerHTML.replaceAll("\n", "").trim(),
+              matchUrl: matchDataExtra[0].querySelector("a.stretched-link").outerHTML.split("/")[2],
+              url: matchDataExtra[0].querySelector("a.stretched-link").getAttribute("href"),
               mapName: matchDataExtra[2] ? matchDataExtra[2].innerHTML.replaceAll("\n", "").trim() : "---",
               // matchDataExtraDurationAndDate: matchDataExtra[3].innerHTML,
               matchDuration: matchDataExtraDurationAndDate[0].querySelector("small") ?  matchDataExtraDurationAndDate[0].querySelector("small").innerHTML : "---",
@@ -144,7 +146,7 @@ module.exports = {
       });
       
       // players = players.filter((pl) => pl.name.includes('XEVER | '))
-      // console.log("players",players[0]);
+      console.log("players",players[0]);
       // console.log("playersasdasd",players[0].teamA.list);
       // console.log("matches",matches);
       

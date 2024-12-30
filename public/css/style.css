@@ -373,6 +373,29 @@ main #data-table .td-winrate {
 
 .player-overlay .player-left {
   width: 25%;
+  display: flex;
+  flex-direction: column;
+}
+
+.player-overlay .player-left h4{
+  font-size: 32px;
+  margin: 15px 0;
+}
+
+.player-overlay .player-left > i {
+  color: gray;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.player-overlay .player-left a {
+  text-decoration: none;
+  color: #D58A25;
+  font-weight: 200;
+}
+
+.player-overlay .player-left a:hover {
+  text-decoration: underline;
 }
 
 .player-overlay .player-right {
@@ -382,7 +405,8 @@ main #data-table .td-winrate {
 .player-overlay .player-cards {
   display: flex;
   justify-content: space-around;
-    width: 100%;
+  width: 100%;
+  margin-bottom: 10px;
 }
 
 .player-overlay .player-cards > div {
@@ -416,6 +440,13 @@ main #data-table .td-winrate {
   display: flex;
   flex-direction: column;
   width: 100%;
+  position: relative;
+}
+
+.player-overlay .player-matches .spinner-border {
+  position: absolute;
+  top: 50%;
+  left: 50%;
 }
 
 .player-overlay .player-matches .every-match {
@@ -424,9 +455,26 @@ main #data-table .td-winrate {
   margin: 4px 0;
   padding: 8px;
   justify-content: space-between;
+  position: relative;
 }
+
+.player-overlay .player-matches .every-match .match-link {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+}
+
+.player-overlay .player-matches .every-match:hover .every-match-info .match-mode {
+  text-decoration: underline;
+}
+
 .player-overlay .player-matches .every-match > img {
   width: 10%;
+  height: 10%;
+  align-self: center;
 }
 
 .player-overlay .player-matches .every-match .every-match-info {
@@ -484,6 +532,32 @@ main #data-table .td-winrate {
 
 .player-overlay .player-matches .every-match .every-match-teams ul li {
   padding: 3px 7px;
+  position: relative;
+}
+
+.player-overlay .player-matches .every-match .every-match-teams ul li .player-color {
+  padding: 13px 3px;
+  border-radius: 10px;
+  position: absolute;
+  background-color: white;
+  top: 5px;
+}
+
+.player-overlay .player-matches .every-match .every-match-teams ul li .player-color.color-1 { background-color: blue; }
+.player-overlay .player-matches .every-match .every-match-teams ul li .player-color.color-2 { background-color: red; }
+.player-overlay .player-matches .every-match .every-match-teams ul li .player-color.color-3 { background-color: lime; }
+.player-overlay .player-matches .every-match .every-match-teams ul li .player-color.color-4 { background-color: #ff0; }
+.player-overlay .player-matches .every-match .every-match-teams ul li .player-color.color-5 { background-color: aqua; }
+.player-overlay .player-matches .every-match .every-match-teams ul li .player-color.color-6 { background-color: #f0f; }
+.player-overlay .player-matches .every-match .every-match-teams ul li .player-color.color-7 { background-color: #434343; }
+.player-overlay .player-matches .every-match .every-match-teams ul li .player-color.color-8 { background-color: #ff8201; }
+
+.player-overlay .player-matches .every-match .every-match-teams ul.team-one li .player-color {
+  left: 0;
+}
+
+.player-overlay .player-matches .every-match .every-match-teams ul.team-two li .player-color {
+  right: 0;
 }
 
 .player-overlay .player-matches .every-match .every-match-teams .won {
