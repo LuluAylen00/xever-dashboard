@@ -420,7 +420,7 @@ window.addEventListener("load", async ()=> {
             tbody.innerHTML += `
               <tr data-name="${player.name}" data-rating="${player.rating}" data-streak="${player.streak}" data-totalmatches="${player.losses + player.wins}" data-wins="${player.wins}" data-losses="${player.losses}" data-winrate="${trunc(100 * player.wins / (player.losses + player.wins), 2)}">
                 <th class="td-number" scope="row">${i + 1}</th>
-                <td class="td-nick"><img src="${await getImage(player.name)}"> ${player.name} <i>(#${player.rank})</i></td>
+                <td class="td-nick"><img src="${await getImage(player.name)}"> ${player.name}</td>
                 <td class="td-center td-wins">${player.birthday}</td>
               </tr>
             `;

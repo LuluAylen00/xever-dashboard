@@ -441,6 +441,7 @@ main #data-table .td-winrate {
   flex-direction: column;
   width: 100%;
   position: relative;
+  padding: 0;
 }
 
 .player-overlay .player-matches .spinner-border {
